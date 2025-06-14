@@ -1553,34 +1553,34 @@
         themeToggleBtn.addEventListener('click', toggleTheme);
         soundToggleBtn.addEventListener('click', toggleSound);
 
-        function populateDifficultySelector() {
-            console.log("[Difficulty Selector] Populating difficulty selector...");
-            difficultySelector.innerHTML = '';
-            for (const key in Difficulty) {
-                if (Object.prototype.hasOwnProperty.call(Difficulty, key) &&
-                    typeof Difficulty[key] === 'object' &&
-                    Difficulty[key] !== null &&
-                    Difficulty[key].displayNameKey) {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    
-                    let optionText = translate(Difficulty[key].displayNameKey);
+       function populateDifficultySelector() {
+    console.log("[Difficulty Selector] Populating difficulty selector...");
+    difficultySelector.innerHTML = '';
+    for (const key in Difficulty) {
+        if (Object.prototype.hasOwnProperty.call(Difficulty, key) &&
+            typeof Difficulty[key] === 'object' &&
+            Difficulty[key] !== null &&
+            Difficulty[key].displayNameKey) {
+            const option = document.createElement('option');
+            option.value = key;
+            
+            let optionText = translate(Difficulty[key].displayNameKey);
 
-                    if (key !== 'NORMAL') {
-                        const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
-                        optionText = `${optionText} x${multiplier} SCG`;
-                    }
-                    
-                    option.textContent = optionText;
-                    difficultySelector.appendChild(option);
-                } else {
-                    console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
-                }
+            if (key !== 'NORMAL') {
+                const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
+                optionText += ` x${multiplier} SCG`; // Используем += для добавления множителя без дублирования
             }
-            difficultySelector.value = currentDifficultyKey;
-            updateRewardRangeDisplay();
-            console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
+            
+            option.textContent = optionText;
+            difficultySelector.appendChild(option);
+        } else {
+            console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
         }
+    }
+    difficultySelector.value = currentDifficultyKey;
+    updateRewardRangeDisplay();
+    console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
+}
 
         function populateLanguageSelector() {
             console.log("[Language Selector] Populating language selector...");
