@@ -299,8 +299,8 @@
             align-items: center;
             width: 100%;
             margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
+            flex-wrap: wrap; /* Allow wrapping for smaller screens */
+            gap: 0.5rem; /* Space between items */
         }
         /* Toggle Switch Styles */
         .toggle-switch {
@@ -367,7 +367,7 @@
                 <span class="slider"></span>
             </label>
         </div>
-        
+       
         <p id="reward-range-display" class="text-sm text-gray-600 mb-4"></p>
 
         <div class="stats-grid">
@@ -381,11 +381,11 @@
 
         <div id="hints-container" class="hints-container">
             <p class="text-base font-semibold mb-2 text-gray-700" data-translate="hints_title">Подсказки:</p>
-        </div>
+            </div>
 
         <div class="relative-container">
             <div id="guess-input-container" class="flex justify-center items-center mb-6">
-            </div>
+                </div>
         </div>
 
         <div class="flex space-x-4 mb-6">
@@ -437,9 +437,9 @@
         const newGameButton = document.getElementById('new-game-button');
         const solutionDisplay = document.getElementById('solution-display');
         const difficultySelector = document.getElementById('difficulty-selector');
-        const languageSelector = document.getElementById('language-selector');
-        const themeSelector = document.getElementById('theme-selector');
-        const soundToggle = document.getElementById('sound-toggle');
+        const languageSelector = document.getElementById('language-selector'); // New language selector
+        const themeSelector = document.getElementById('theme-selector'); // New theme selector
+        const soundToggle = document.getElementById('sound-toggle'); // New sound toggle
         const hintModalOverlay = document.getElementById('hint-modal-overlay');
         const modalMessage = document.getElementById('modal-message');
         const modalConfirmButton = document.getElementById('modal-confirm-button');
@@ -452,7 +452,7 @@
 
         // --- Game State Variables ---
         let totalCoins = 0;
-        const INITIAL_COINS = 100;
+        const INITIAL_COINS = 100; // Initial coins for new players - МОЖНО МЕНЯТЬ ЗДЕСЬ (строка 183)
 
         let stats = {
             NORMAL: { gamesPlayed: 0, bestTime: Infinity },
@@ -461,20 +461,21 @@
         };
         let currentDifficultyKey = 'NORMAL';
 
-        let currentHintCost = 0;
+        let currentHintCost = 0; // Stores the cost for the current hint purchase attempt
         let hintsBoughtThisGame = 0;
-        let revealedDigits = new Map();
-        let lockedDigits = new Map();
+        let revealedDigits = new Map(); // Store revealed digits: index -> value (from hints)
+        let lockedDigits = new Map(); // Store locked digits: index -> value (from incorrect guesses on Normal)
 
         let timerInterval;
         let startTime;
         let currentElapsedTime = 0;
         let isGameInProgress = false;
-        let activeHintIndex = -1;
+        let activeHintIndex = -1; // Index of the digit for which hint is being bought
 
-        let coinRecoveryTimer = null;
+        let coinRecoveryTimer = null; // Timer for coin recovery countdown
         let coinRecoveryCountdownSeconds = 0;
 
+        // Unlock states for difficulties
         let unlockedDifficulties = {
             NORMAL: true,
             HARD: false,
@@ -486,7 +487,7 @@
         };
 
         // --- Localization Variables ---
-        let translations = {};
+        let translations = {}; // Stores loaded translations
         const supportedLanguages = {
             'en': 'English',
             'ru': 'Русский',
@@ -499,13 +500,13 @@
             'uz': 'Oʻzbekcha',
             'id': 'Bahasa Indonesia'
         };
-        let currentLanguage = 'en';
+        let currentLanguage = 'en'; // Default language
 
         // --- Theme Variable ---
-        let currentTheme = 'light';
+        let currentTheme = 'light'; // Default theme
 
         // --- Sound Variable ---
-        let soundEnabled = true;
+        let soundEnabled = true; // Default sound state
 
         // Enumeration for hint rules
         const HintRule = {
@@ -514,7 +515,7 @@
             TWO_CORRECT_ZERO_PLACE: { correctDigits: 2, correctPositions: 0, translationKey: 'hint_rule_2_0' },
             THREE_CORRECT_TWO_PLACE: { correctDigits: 3, correctPositions: 2, translationKey: 'hint_rule_3_2' }
         };
-        // Enumeration for difficulty levels
+        // Enumeration for difficulty levels with specific reward ranges
         const Difficulty = {
             NORMAL: {
                 displayNameKey: "difficulty_normal",
@@ -523,8 +524,8 @@
                 attempts: 5,
                 rewardRange: { min: 20, max: 100 },
                 hintCostRange: { min: 90, max: 450 },
-                recoveryTime: 5,
-                recoveryAmount: 100,
+                recoveryTime: 5, // seconds
+                recoveryAmount: 100, // SCG - начальное количество монет для Normal, также для восстановления
                 hintRules: [
                     HintRule.ONE_CORRECT_ONE_PLACE,
                     HintRule.TWO_CORRECT_ONE_PLACE,
@@ -538,8 +539,8 @@
                 attempts: 5,
                 rewardRange: { min: 100, max: 500 },
                 hintCostRange: { min: 450, max: 2250 },
-                recoveryTime: 10,
-                recoveryAmount: 500,
+                recoveryTime: 10, // seconds (not used for Hard/Crazy recovery logic)
+                recoveryAmount: 500, // SCG - базовое количество монет для Hard
                 hintRules: [
                     HintRule.ONE_CORRECT_ONE_PLACE,
                     HintRule.TWO_CORRECT_ONE_PLACE,
@@ -553,8 +554,8 @@
                 attempts: 5,
                 rewardRange: { min: 500, max: 2500 },
                 hintCostRange: { min: 2250, max: 11250 },
-                recoveryTime: 15,
-                recoveryAmount: 2500,
+                recoveryTime: 15, // seconds (not used for Hard/Crazy recovery logic)
+                recoveryAmount: 2500, // SCG - базовое количество монет для Crazy
                 hintRules: [
                     HintRule.ONE_CORRECT_ONE_PLACE,
                     HintRule.TWO_CORRECT_ONE_PLACE,
@@ -580,7 +581,7 @@
                 this.isGameOver = isGameOver;
                 this.reward = reward;
                 this.attemptsLeft = attemptsLeft;
-                this.correctlyPlacedDigits = correctlyPlacedDigits;
+                this.correctlyPlacedDigits = correctlyPlacedDigits; // Array of indices [0, 2]
             }
         }
 
@@ -617,6 +618,10 @@
                 return this.secretCode;
             }
 
+            /**
+             * Calculates the reward based on the current difficulty's reward range.
+             * @returns {number} The calculated reward.
+             */
             getReward() {
                 const { min, max } = this.difficulty.rewardRange;
                 const reward = getRandomInt(min, max);
@@ -624,6 +629,10 @@
                 return reward;
             }
 
+            /**
+             * Calculates the hint cost based on the current difficulty's hint cost range.
+             * @returns {number} The calculated hint cost.
+             */
             getHintCost() {
                 const { min, max } = this.difficulty.hintCostRange;
                 return getRandomInt(min, max);
@@ -635,6 +644,7 @@
                 return digits.slice(0, this.codeLength).join('');
             }
 
+            // Main method to reset game state in GameLogic
             resetGame() {
                 this.resetGameLogicState();
                 let hintsResult = null;
@@ -657,24 +667,28 @@
 
                 if (hintsResult === null) {
                     console.error(`[GameLogic] Critical Error: Failed to generate unique hints after ${maxPuzzleGenerationAttempts} total attempts.`);
+                    // Even if generation fails, we return a structure for UI to display something
                     return new ResetGameResult("", [], [], this.difficulty.codeLength, this.difficulty.attempts);
                 }
 
                 return new ResetGameResult(this.secretCode, this.currentHints, this.currentHintRules, this.difficulty.codeLength, this.difficulty.attempts);
             }
 
+            // --- START OF HINT GENERATION LOGIC (FROM USER'S PROVIDED SAFE CRACKING.TXT) ---
             generateHints(answer) {
                 console.log(`[GameLogic.generateHints] Generating hints for code length: ${this.codeLength}, answer: ${answer}`);
                 const hints = [];
                 const rules = [];
                 const answerDigits = answer.split('').map(Number);
+                // Convert to numbers for calculations
                 const allDigits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-
+                // Helper to check conditions for a hint
                 const checkHint = (guess, secret, rule) => {
                     let correctPlaceCount = 0;
                     let correctDigitsCount = 0;
-                    let secretCopy = secret.slice();
+                    let secretCopy = secret.slice(); // Copy secret to modify for correct digits check
 
+                    // First pass: check for correct position
                     let guessNoCorrectPlace = [];
                     let secretNoCorrectPlace = [];
                     for (let i = 0; i < guess.length; i++) {
@@ -686,11 +700,12 @@
                         }
                     }
 
+                    // Second pass: check for correct digits (not in place)
                     for (let i = 0; i < guessNoCorrectPlace.length; i++) {
                         const indexInSecret = secretNoCorrectPlace.indexOf(guessNoCorrectPlace[i]);
                         if (indexInSecret !== -1) {
                             correctDigitsCount++;
-                            secretNoCorrectPlace.splice(indexInSecret, 1);
+                            secretNoCorrectPlace.splice(indexInSecret, 1); // Remove found digit to avoid double counting
                         }
                     }
 
@@ -698,18 +713,21 @@
                     return totalCorrectDigits === rule.correctDigits && correctPlaceCount === rule.correctPositions;
                 };
 
+                // Try to generate a hint for a given rule
                 const tryGenerateHint = (rule, attempts = 1000) => {
                     for (let i = 0; i < attempts; i++) {
                         const candidateHintDigits = [];
                         const availableDigits = allDigits.slice();
 
-                        for (let j = 0; j < this.codeLength; j++) {
+                        // Ensure digits are unique for the hint
+                        for (let j = 0; j < this.codeLength; j++) { // Use this.codeLength
                             const randomIndex = Math.floor(Math.random() * availableDigits.length);
                             candidateHintDigits.push(availableDigits[randomIndex]);
                             availableDigits.splice(randomIndex, 1);
                         }
                         const candidateHint = candidateHintDigits.join('');
                         if (checkHint(candidateHint.split('').map(Number), answerDigits, rule)) {
+                            // Check if hint is not the answer itself and not a duplicate of existing hints
                             if (candidateHint !== answer && !hints.includes(candidateHint)) {
                                 return candidateHint;
                             }
@@ -717,8 +735,10 @@
                     }
                     return null;
                 };
-
+                // Generate hints based on difficulty's hintRules
                 const currentDifficultyHintRules = [...this.difficulty.hintRules];
+                // Copy array
+                // Shuffle rules to get diverse hints
                 currentDifficultyHintRules.sort(() => Math.random() - 0.5);
                 for (const rule of currentDifficultyHintRules) {
                     if (hints.length >= this.numberOfHints) break;
@@ -729,21 +749,24 @@
                     }
                 }
 
+                // Fallback if not enough unique hints could be generated (should not happen often with unique solution check)
                 while (hints.length < this.numberOfHints) {
                     const randomHintDigits = [];
-                    for (let i = 0; i < this.codeLength; i++) {
+                    for(let i = 0; i < this.codeLength; i++) {
                         randomHintDigits.push(Math.floor(Math.random() * 10));
                     }
                     const newHint = randomHintDigits.join('');
                     if (newHint !== answer && !hints.includes(newHint)) {
                         hints.push(newHint);
-                        rules.push(HintRule.ONE_CORRECT_ONE_PLACE);
+                        rules.push(HintRule.ONE_CORRECT_ONE_PLACE); // Default fallback rule
                     }
                 }
 
-                if (!this.checkUniqueSolution(hints, rules, answer)) {
+                // Important: Call checkUniqueSolution after all hints are generated
+                if (!this.checkUniqueSolution(hints, rules, answer))
+                {
                     console.warn("[GameLogic.generateHints] Failed unique solution check for generated hints. Retrying puzzle generation.");
-                    return null;
+                    return null; // Signal to resetGame to try again
                 }
 
                 return { first: hints, second: rules };
@@ -752,7 +775,7 @@
             checkUniqueSolution(hints, rules, answer) {
                 const allPossibleCodes = [];
                 const digits = Array.from({ length: 10 }, (_, i) => i.toString());
-                const self = this;
+                const self = this; // Capture 'this' for the recursive function
                 function generatePermutationsRecursive(currentCode, availableDigits) {
                     if (currentCode.length === self.codeLength) {
                         allPossibleCodes.push(currentCode);
@@ -785,6 +808,7 @@
                     }
                 }
                 console.log(`[GameLogic] Unique solution check for code ${answer}: Found ${matchingCodes.length} matching codes. Correct: ${matchingCodes.includes(answer)}`);
+                // Check if there is exactly one matching code AND that code is the answer
                 return matchingCodes.length === 1 && matchingCodes[0] === answer;
             }
 
@@ -795,6 +819,7 @@
 
                 let secretCopy = candidateCodeArr.slice();
                 let guessCopy = hintArr.slice();
+                // Check for correct position (P) and remove them from copies
                 for (let i = 0; i < this.codeLength; i++) {
                     if (guessCopy[i] === secretCopy[i]) {
                         correctPlaceCount++;
@@ -804,6 +829,7 @@
                 }
 
                 let correctDigitsNotPlace = 0;
+                // Check for correct digits (D)
                 for (let i = 0; i < this.codeLength; i++) {
                     if (guessCopy[i] !== -1) {
                         const indexInSecret = secretCopy.indexOf(guessCopy[i]);
@@ -817,10 +843,17 @@
                 const totalCorrectDigits = correctPlaceCount + correctDigitsNotPlace;
                 return totalCorrectDigits === rule.correctDigits && correctPlaceCount === rule.correctPositions;
             }
+            // --- END OF HINT GENERATION LOGIC ---
 
+            /**
+             * Calculates indices of digits that are correct AND in the correct position.
+             * @param {string[]} guess - The current guess as an array of strings.
+             * @param {string} secret - The secret code as a string.
+             * @returns {number[]} An array of indices where digits are correctly placed.
+             */
             calculateCorrectlyPlacedDigits(guess, secret) {
                 const correctlyPlacedIndices = [];
-                for (let i = 0; i < secret.length; i++) {
+                for (let i = 0; i < this.codeLength; i++) {
                     if (guess[i] === secret[i]) {
                         correctlyPlacedIndices.push(i);
                     }
@@ -828,239 +861,134 @@
                 return correctlyPlacedIndices;
             }
 
-            makeGuess(guessArray) {
+            /**
+             * Processes a player's guess.
+             * @param {string} guess - The player's current guess.
+             * @returns {GuessResult} An object indicating win/loss, reward, and attempts left.
+             */
+            makeGuess(guess) {
                 this.currentGuessAttempt++;
-                const guessString = guessArray.join('');
+                console.log(`[GameLogic] Attempt ${this.currentGuessAttempt} of ${this.maxGuessAttempts}. Guess: ${guess}, Secret: ${this.secretCode}`);
 
-                let correctlyPlacedIndices = null;
+                const correctlyPlacedDigits = this.calculateCorrectlyPlacedDigits(guess.split(''), this.secretCode.split(''));
 
-                if (guessString === this.secretCode) {
+                if (guess === this.secretCode) {
                     const reward = this.getReward();
-                    return new GuessResult(
-                        true,
-                        true,
-                        reward,
-                        this.maxGuessAttempts - this.currentGuessAttempt,
-                        correctlyPlacedIndices
-                    );
+                    return new GuessResult(true, true, reward, this.getAttemptsLeft(), correctlyPlacedDigits);
+                } else if (this.currentGuessAttempt >= this.maxGuessAttempts) {
+                    return new GuessResult(false, true, 0, 0, correctlyPlacedDigits);
                 } else {
-                    correctlyPlacedIndices = this.calculateCorrectlyPlacedDigits(guessArray, this.secretCode.split(''));
-                    if (this.currentGuessAttempt < this.maxGuessAttempts) {
-                        return new GuessResult(
-                            false,
-                            false,
-                            0,
-                            this.maxGuessAttempts - this.currentGuessAttempt,
-                            correctlyPlacedIndices
-                        );
-                    } else {
-                        return new GuessResult(
-                            false,
-                            true,
-                            0,
-                            0,
-                            correctlyPlacedIndices
-                        );
-                    }
+                    return new GuessResult(false, false, 0, this.getAttemptsLeft(), correctlyPlacedDigits);
                 }
-            }
-
-            getHintsAndRules() {
-                return { first: this.currentHints, second: this.currentHintRules };
             }
         }
 
-        let gameLogic;
-
+        // --- Utility Functions ---
         function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
         function formatTime(seconds) {
-            if (seconds === Infinity) return '00:00';
             const minutes = Math.floor(seconds / 60);
             const remainingSeconds = seconds % 60;
             return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
         }
 
-        function formatLargeNumber(num) {
-            const absNum = Math.abs(num);
-            if (absNum < 1000) {
-                return num.toString();
-            }
-
-            const lookup = [
-                { value: 1, symbol: "" },
-                { value: 1e3, symbol: "K" },
-                { value: 1e6, symbol: "M" },
-                { value: 1e9, symbol: "B" },
-                { value: 1e12, symbol: "T" },
-                { value: 1e15, symbol: "Q" },
-                { value: 1e18, symbol: "Qi" },
-            ];
-
-            const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-            let item = lookup.slice().reverse().find(function(item) {
-                return absNum >= item.value;
-            });
-
-            if (item) {
-                let scaledNum = (num / item.value).toFixed(2);
-                return scaledNum.replace(rx, "$1") + item.symbol;
-            }
-            return num.toString();
+        function saveGameData() {
+            localStorage.setItem('totalCoins', totalCoins);
+            localStorage.setItem('stats', JSON.stringify(stats));
+            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
+            localStorage.setItem('currentLanguage', currentLanguage);
+            localStorage.setItem('currentTheme', currentTheme); // Save theme
+            localStorage.setItem('soundEnabled', soundEnabled); // Save sound state
+            console.log("[Data] Game data saved.");
         }
 
-        async function loadTranslations(langCode) {
+        function loadGameData() {
+            totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS, 10);
+            const savedStats = localStorage.getItem('stats');
+            if (savedStats) {
+                stats = JSON.parse(savedStats);
+            } else {
+                console.log("[Data] No saved stats found, initializing with default.");
+            }
+            const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
+            if (savedUnlockedDifficulties) {
+                unlockedDifficulties = JSON.parse(savedUnlockedDifficulties);
+            } else {
+                console.log("[Data] No unlocked difficulties found, initializing with default.");
+            }
+            currentLanguage = localStorage.getItem('currentLanguage') || (Telegram.WebApp.initDataUnsafe.user?.language_code || 'en');
+            currentTheme = localStorage.getItem('currentTheme') || 'light'; // Load theme
+            soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') || 'true'); // Load sound state
+            console.log("[Data] Game data loaded.");
+        }
+
+        // --- Localization Functions ---
+        async function loadTranslations(lang) {
             try {
-                const response = await fetch(`./locales/${langCode}.json`);
+                const response = await fetch(`translations/${lang}.json`); // Assuming translations are in a 'translations' folder
                 if (!response.ok) {
-                    console.warn(`[Localization] Translations for ${langCode} not found, falling back to 'en'.`);
-                    if (langCode !== 'en') {
-                        return await loadTranslations('en');
-                    }
-                    throw new Error(`Failed to load translations for ${langCode}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 translations = await response.json();
-                currentLanguage = langCode;
-                console.log(`[Localization] Loaded translations for: ${langCode}`);
+                console.log(`[Localization] Loaded translations for ${lang}`);
                 applyTranslations();
-                saveGameData();
+                populateDifficultySelector(); // Re-populate difficulty selector with translated names
+                updateRewardRangeDisplay();
             } catch (error) {
-                console.error(`[Localization] Error loading translations for ${langCode}:`, error);
-                if (langCode !== 'en' && Object.keys(translations).length === 0) {
-                    console.log("[Localization] Falling back to English due to error.");
-                    await loadTranslations('en');
+                console.error("[Localization] Could not load translations for", lang, error);
+                // Fallback to English if loading fails
+                currentLanguage = 'en';
+                const response = await fetch(`translations/en.json`);
+                if (response.ok) {
+                    translations = await response.json();
+                    applyTranslations();
+                    populateDifficultySelector();
+                    updateRewardRangeDisplay();
+                } else {
+                    console.error("[Localization] Could not load fallback English translations.");
                 }
             }
         }
 
         function translate(key, params = {}) {
-            let translated = translations[key] || key;
+            let text = translations[key] || key; // Fallback to key if translation not found
             for (const paramKey in params) {
-                if (Object.prototype.hasOwnProperty.call(params, paramKey)) {
-                    translated = translated.replace(`{${paramKey}}`, params[paramKey]);
-                }
+                text = text.replace(`{${paramKey}}`, params[paramKey]);
             }
-            return translated;
+            return text;
         }
 
         function applyTranslations() {
             document.querySelectorAll('[data-translate]').forEach(element => {
                 const key = element.dataset.translate;
-                let params = {};
-                try {
-                    if (element.dataset.translateParams) {
-                        params = JSON.parse(element.dataset.translateParams);
-                    }
-                } catch (e) {
-                    console.error("Error parsing data-translate-params for key:", key, e);
-                }
+                const params = element.dataset.translateParams ? JSON.parse(element.dataset.translateParams) : {};
                 element.textContent = translate(key, params);
             });
-            populateDifficultySelector();
-            if (!hintModalOverlay.classList.contains('hidden')) {
-                const cost = currentHintCost;
-                modalMessage.textContent = translate('hint_cost_message', { cost: cost });
-                modalConfirmButton.textContent = translate('buy_button');
-            }
-            if (!coinRecoveryModalOverlay.classList.contains('hidden')) {
-                recoveryOkButton.textContent = translate('ok_button');
-            }
+            // Update specific dynamic texts
+            updateRewardRangeDisplay();
+            updateStatsDisplay();
+            updateMessageDisplay(gameLogic.getAttemptsLeft()); // Update initial message based on attempts
         }
 
-        function saveGameData() {
-            localStorage.setItem('totalCoins', totalCoins);
-            const serializableStats = JSON.parse(JSON.stringify(stats));
-            for (const diffKey in serializableStats) {
-                if (serializableStats[diffKey].bestTime === Infinity) {
-                    serializableStats[diffKey].bestTime = null;
-                }
-            }
-            localStorage.setItem('stats', JSON.stringify(serializableStats));
-            localStorage.setItem('currentDifficultyKey', currentDifficultyKey);
-            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
-            localStorage.setItem('currentLanguage', currentLanguage);
-            localStorage.setItem('currentTheme', currentTheme);
-            localStorage.setItem('soundEnabled', soundEnabled);
-            console.log("[Save] Game data saved.");
-        }
-
-        function loadGameData() {
-            console.log("[Load] Loading game data...");
-            totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
-            const savedStats = localStorage.getItem('stats');
-            if (savedStats) {
-                try {
-                    stats = JSON.parse(savedStats);
-                    for (const diffKey in stats) {
-                        if (stats[diffKey].bestTime === null) {
-                            stats[diffKey].bestTime = Infinity;
-                        }
-                        if (typeof stats[diffKey].gamesPlayed === 'undefined') stats[diffKey].gamesPlayed = 0;
-                        if (typeof stats[diffKey].bestTime === 'undefined') stats[diffKey].bestTime = Infinity;
-                    }
-                } catch (e) {
-                    console.error("[Load] Error parsing saved stats, resetting.", e);
-                    stats = {
-                        NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                        HARD: { gamesPlayed: 0, bestTime: Infinity },
-                        CRAZY: { gamesPlayed: 0, bestTime: Infinity }
-                    };
-                }
-            } else {
-                console.log("[Load] No saved stats found, initializing new stats.");
-                stats = {
-                    NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                    HARD: { gamesPlayed: 0, bestTime: Infinity },
-                    CRAZY: { gamesPlayed: 0, bestTime: Infinity }
-                };
-            }
-
-            const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
-            if (savedUnlockedDifficulties) {
-                try {
-                    unlockedDifficulties = JSON.parse(savedUnlockedDifficulties);
-                } catch (e) {
-                    console.error("[Load] Error parsing unlocked difficulties, resetting.", e);
-                    unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
-                }
-            } else {
-                unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
-            }
-
-            const savedDifficultyKey = localStorage.getItem('currentDifficultyKey');
-            if (savedDifficultyKey && Difficulty[savedDifficultyKey]) {
-                currentDifficultyKey = savedDifficultyKey;
-            } else {
-                currentDifficultyKey = 'NORMAL';
-            }
-            difficultySelector.value = currentDifficultyKey;
-
-            const savedLanguage = localStorage.getItem('currentLanguage');
-            const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
-            const browserLanguage = navigator.language.split('-')[0];
-
-            if (savedLanguage && supportedLanguages[savedLanguage]) {
-                currentLanguage = savedLanguage;
-            } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
-                currentLanguage = telegramLanguage;
-            } else if (browserLanguage && supportedLanguages[browserLanguage]) {
-                currentLanguage = browserLanguage;
-            } else {
-                currentLanguage = 'en';
+        function populateLanguageSelector() {
+            languageSelector.innerHTML = ''; // Clear existing options
+            for (const langCode in supportedLanguages) {
+                const option = document.createElement('option');
+                option.value = langCode;
+                option.textContent = supportedLanguages[langCode];
+                languageSelector.appendChild(option);
             }
             languageSelector.value = currentLanguage;
-
-            currentTheme = localStorage.getItem('currentTheme') || 'light';
-            soundEnabled = JSON.parse(localStorage.getItem('soundEnabled') || 'true');
-
-            gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-            console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Unlocked:", unlockedDifficulties, "Language:", currentLanguage, "Theme:", currentTheme, "Sound:", soundEnabled);
+            console.log("[Language Selector] Selector value set to:", currentLanguage);
         }
 
+        // --- Theme Functions ---
         function applyTheme(theme) {
-            document.body.className = '';
+            document.body.className = ''; // Clear existing theme classes
             document.body.classList.add(`${theme}-theme`);
             currentTheme = theme;
             saveGameData();
@@ -1072,11 +1000,17 @@
             console.log("[Theme Selector] Selector value set to:", currentTheme);
         }
 
+        // --- Sound Functions ---
         function playSound(soundType) {
             if (!soundEnabled) {
                 return;
             }
+            // Placeholder for actual sound playing logic
+            // In a real game, you would load and play audio files here
             console.log(`[Sound] Playing sound: ${soundType}`);
+            // Example:
+            // const audio = new Audio(`sounds/${soundType}.mp3`);
+            // audio.play();
         }
 
         function toggleSound(enable) {
@@ -1085,403 +1019,255 @@
             console.log(`[Sound] Sound enabled: ${soundEnabled}`);
         }
 
-        function resetGame() {
-            console.log("[Game Reset] Resetting game...");
-            stopTimer();
-            currentElapsedTime = 0;
-            hintsBoughtThisGame = 0;
-            revealedDigits.clear();
-            lockedDigits.clear();
-            currentHintCost = 0;
-
-            gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-            createGuessInputs(gameLogic.codeLength);
-
-            const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-
-            if (isCurrentDifficultyUnlockedState) {
-                isGameInProgress = true;
-                const resetResult = gameLogic.resetGame();
-                if (resetResult.secretCode === "") {
-                    showMessage(translate('puzzle_generation_failed'), 'red');
-                    solutionDisplay.textContent = '****';
-                    guessButton.disabled = true;
-                    isGameInProgress = false;
-                    console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
-                    saveGameData();
-                    updateUI();
-                    return;
-                }
-                showMessage(translate('guess_code_message', {codeLength: gameLogic.codeLength}) + ' ' + translate('attempts_left_message', {attemptsLeft: gameLogic.getAttemptsLeft()}), 'default');
-                solutionDisplay.textContent = '****';
-                newGameButton.classList.add('hidden');
-
-                displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
-                startTimer();
-                Telegram.WebApp.setHeaderColor('secondary_bg_color');
-            } else {
-                isGameInProgress = false;
-                const requiredCoins = UNLOCK_COSTS[currentDifficultyKey];
-                showMessage(translate('difficulty_locked', {difficultyName: translate(Difficulty[currentDifficultyKey].displayNameKey), cost: requiredCoins}), 'red');
-                solutionDisplay.textContent = '****';
-                newGameButton.classList.add('hidden');
-
-                const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-                const tempResetResult = tempGameLogic.resetGame();
-                displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-                stopTimer();
-                timerDisplay.textContent = formatTime(0);
-                Telegram.WebApp.setHeaderColor('secondary_bg_color');
-            }
-
-            updateUI();
-            saveGameData();
-            console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
-        }
-
-        function checkGuess() {
-            const guessArray = Array.from(guessInputContainer.querySelectorAll('.digit-display')).map(el => el.textContent);
-            const guessResult = gameLogic.makeGuess(guessArray);
-
-            if (guessResult.isWin) {
-                stopTimer();
-                isGameInProgress = false;
-                const earnedCoins = guessResult.reward;
-                totalCoins += earnedCoins;
-                stats[currentDifficultyKey].gamesPlayed++;
-                if (currentElapsedTime < stats[currentDifficultyKey].bestTime) {
-                    stats[currentDifficultyKey].bestTime = currentElapsedTime;
-                }
-
-                if (!unlockedDifficulties.HARD && totalCoins >= UNLOCK_COSTS.HARD) {
-                    unlockedDifficulties.HARD = true;
-                    Telegram.WebApp.showPopup({
-                        title: translate('new_level_unlocked'),
-                        message: translate('unlocked_level_message', {levelName: translate(Difficulty.HARD.displayNameKey)}),
-                        buttons: [{ id: 'ok', type: 'ok', text: translate('hooray_button') }]
-                    });
-                    populateDifficultySelector();
-                }
-                if (!unlockedDifficulties.CRAZY && totalCoins >= UNLOCK_COSTS.CRAZY) {
-                    unlockedDifficulties.CRAZY = true;
-                    Telegram.WebApp.showPopup({
-                        title: translate('new_level_unlocked'),
-                        message: translate('unlocked_level_message', {levelName: translate(Difficulty.CRAZY.displayNameKey)}),
-                        buttons: [{ id: 'ok', type: 'ok', text: translate('hooray_button') }]
-                    });
-                    populateDifficultySelector();
-                }
-
-                updateUI();
-                saveGameData();
-
-                showMessage(translate('safe_cracked_win', {earnedCoins: earnedCoins}), 'green');
-                solutionDisplay.textContent = '****';
-                guessButton.disabled = true;
-                newGameButton.classList.remove('hidden');
-                Telegram.WebApp.showPopup({
-                    title: translate('victory_title'),
-                    message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
-                    buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
-                });
-                Telegram.WebApp.setHeaderColor('accent_text_color');
-            } else if (guessResult.isGameOver) {
-                stopTimer();
-                isGameInProgress = false;
-
-                stats[currentDifficultyKey].gamesPlayed++;
-                updateUI();
-                saveGameData();
-
-                showMessage(translate('game_over_message', {secretCode: gameLogic.getSecretCode()}), 'red');
-                solutionDisplay.textContent = '****';
-                guessButton.disabled = true;
-                newGameButton.classList.remove('hidden');
-                Telegram.WebApp.showPopup({
-                    title: translate('defeat_title'),
-                    message: translate('game_over_message', {secretCode: gameLogic.getSecretCode()}),
-                    buttons: [{ id: 'ok', type: 'ok', text: translate('understood_button') }]
-                });
-                Telegram.WebApp.setHeaderColor('destructive_text_color');
-            } else {
-                showMessage(translate('incorrect_guess_message', {attemptsLeft: guessResult.attemptsLeft}), 'orange');
-                if (currentDifficultyKey === 'NORMAL') {
-                    guessResult.correctlyPlacedDigits.forEach(index => {
-                        lockedDigits.set(index, gameLogic.currentGuess[index]);
-                    });
-                }
-                updateUI();
-                saveGameData();
-            }
-        }
-
-        function tryBuyHint(digitIndex) {
-            if (hintsBoughtThisGame >= 2) {
-                showMessage(translate('hint_max_limit_message'), 'red');
-                return;
-            }
-
-            if (revealedDigits.has(digitIndex)) {
-                showMessage(translate('digit_already_revealed'), 'orange');
-                return;
-            }
-            if (lockedDigits.has(digitIndex)) {
-                showMessage(translate('digit_already_locked'), 'orange');
-                return;
-            }
-
-            if (currentHintCost === 0) {
-                currentHintCost = gameLogic.getHintCost();
-            }
-
-            activeHintIndex = digitIndex;
-
-            modalMessage.textContent = translate('hint_cost_message', {cost: currentHintCost});
-            modalConfirmButton.textContent = translate('buy_button');
-            modalConfirmButton.onclick = () => confirmBuyHint();
-            hintModalOverlay.classList.remove('hidden');
-        }
-
-        function confirmBuyHint() {
-            hintModalOverlay.classList.add('hidden');
-
-            if (totalCoins >= currentHintCost) {
-                totalCoins -= currentHintCost;
-                
-                hintsBoughtThisGame++;
-                const digit = gameLogic.getSecretCode()[activeHintIndex];
-                revealedDigits.set(activeHintIndex, digit);
-                lockedDigits.set(activeHintIndex, digit);
-
-                gameLogic.currentGuess[activeHintIndex] = digit;
-                
-                showMessage(translate('hint_bought_success', {coinsLeft: formatLargeNumber(totalCoins)}), 'blue');
-                currentHintCost = 0;
-                updateUI();
-                saveGameData();
-                activeHintIndex = -1;
-            } else {
-                if (currentDifficultyKey === 'NORMAL') {
-                    startCoinRecovery();
-                } else {
-                    clearInterval(coinRecoveryTimer);
-                    coinRecoveryModalOverlay.classList.remove('hidden');
-                    recoveryModalMessage.textContent = translate('not_enough_coins_other');
-                    recoveryCountdown.textContent = '';
-                    recoveryOkButton.classList.remove('hidden');
-                }
-            }
-        }
-
-        function startCoinRecovery() {
-            const difficulty = Difficulty[currentDifficultyKey];
-            const recoveryTime = difficulty.recoveryTime;
-            const recoveryAmount = difficulty.recoveryAmount;
-
-            clearInterval(coinRecoveryTimer);
-
-            coinRecoveryCountdownSeconds = recoveryTime;
-
-            coinRecoveryModalOverlay.classList.remove('hidden');
-            recoveryOkButton.classList.add('hidden');
-
-            recoveryModalMessage.textContent = translate('not_enough_coins_normal', {seconds: coinRecoveryCountdownSeconds});
-            updateCoinRecoveryCountdown();
-
-            coinRecoveryTimer = setInterval(() => {
-                coinRecoveryCountdownSeconds--;
-                updateCoinRecoveryCountdown();
-
-                if (coinRecoveryCountdownSeconds <= 0) {
-                    clearInterval(coinRecoveryTimer);
-                    totalCoins = recoveryAmount;
-                    saveGameData();
-                    updateUI();
-                    recoveryModalMessage.textContent = translate('coins_recovered_message', {amount: recoveryAmount, totalCoins: formatLargeNumber(totalCoins)});
-                    recoveryCountdown.textContent = '';
-                    recoveryOkButton.classList.remove('hidden');
-                }
-            }, 1000);
-        }
-
-        function updateCoinRecoveryCountdown() {
-            recoveryCountdown.textContent = coinRecoveryCountdownSeconds > 0 ? formatTime(coinRecoveryCountdownSeconds) : '';
-        }
-
-        recoveryOkButton.addEventListener('click', () => {
-            coinRecoveryModalOverlay.classList.add('hidden');
-            showMessage(translate('game_start_message'), 'gray');
-        });
-
-        function showMessage(msg, type) {
-            messageDisplay.textContent = msg;
-            messageDisplay.className = 'text-md italic mb-6';
-            if (type === 'red') {
-                messageDisplay.classList.add('text-red-600');
-            } else if (type === 'green') {
-                messageDisplay.classList.add('text-green-600');
-            } else if (type === 'orange') {
-                messageDisplay.classList.add('text-orange-600');
-            } else if (type === 'blue') {
-                messageDisplay.classList.add('text-blue-600');
-            } else {
-                messageDisplay.classList.add('text-gray-600');
-            }
-        }
-
-        function createGuessInputs(length) {
-            guessInputContainer.innerHTML = '';
-            if (isGameInProgress && (!gameLogic.currentGuess || gameLogic.currentGuess.length !== length)) {
-                gameLogic.currentGuess = Array(length).fill('0');
-            } else if (!isGameInProgress) {
-                gameLogic.currentGuess = Array(length).fill('0');
-            }
-
-            for (let i = 0; i < length; i++) {
-                const picker = document.createElement('div');
-                picker.className = 'digit-picker';
-
-                const upButton = document.createElement('button');
-                upButton.className = 'arrow-button up-arrow';
-                upButton.textContent = '▲';
-                upButton.dataset.index = i;
-                upButton.onclick = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
-                        let currentVal = parseInt(gameLogic.currentGuess[idx]);
-                        gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
-                        updateGuessInputsDisplay();
-                    }
-                };
-                const digitDisplay = document.createElement('span');
-                digitDisplay.className = 'digit-display';
-                digitDisplay.textContent = revealedDigits.has(i) ? revealedDigits.get(i) : gameLogic.currentGuess[i];
-                digitDisplay.dataset.index = i;
-                digitDisplay.onclick = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
-                        let currentVal = parseInt(gameLogic.currentGuess[idx]);
-                        gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
-                        updateGuessInputsDisplay();
-                    }
-                };
-                const downButton = document.createElement('button');
-                downButton.className = 'arrow-button down-arrow';
-                downButton.textContent = '▼';
-                downButton.dataset.index = i;
-                downButton.onclick = (e) => {
-                    const idx = parseInt(e.target.dataset.index);
-                    if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
-                        let currentVal = parseInt(gameLogic.currentGuess[idx]);
-                        gameLogic.currentGuess[idx] = ((currentVal - 1 + 10) % 10).toString();
-                        updateGuessInputsDisplay();
-                    }
-                };
-                const hintButton = document.createElement('button');
-                hintButton.className = 'hint-button';
-                hintButton.textContent = '?';
-                hintButton.dataset.digitIndex = i;
-                hintButton.onclick = () => {
-                    if (isGameInProgress && unlockedDifficulties[currentDifficultyKey]) {
-                        tryBuyHint(i);
-                    }
-                };
-
-                picker.appendChild(upButton);
-                picker.appendChild(digitDisplay);
-                picker.appendChild(downButton);
-                picker.appendChild(hintButton);
-                guessInputContainer.appendChild(picker);
-            }
-            updateUI();
-        }
-
-        function updateGuessInputsDisplay() {
-            const digitDisplays = guessInputContainer.querySelectorAll('.digit-display');
-            digitDisplays.forEach((display, index) => {
-                const currentVal = gameLogic.currentGuess[index];
-                if (revealedDigits.has(index)) {
-                    display.textContent = revealedDigits.get(index);
-                    display.classList.add('correct');
-                } else if (lockedDigits.has(index)) {
-                    display.textContent = lockedDigits.get(index);
-                    display.classList.add('correct');
-                } else {
-                    display.textContent = currentVal;
-                    display.classList.remove('correct');
-                }
-            });
-            updateUI();
-        }
-
-        function updateUI() {
-            totalCoinsDisplay.textContent = formatLargeNumber(totalCoins);
+        // --- UI Update Functions ---
+        function updateStatsDisplay() {
+            totalCoinsDisplay.textContent = totalCoins;
             const currentStats = stats[currentDifficultyKey];
             gamesPlayedDisplay.textContent = currentStats.gamesPlayed;
-            bestTimeDisplay.textContent = formatTime(currentStats.bestTime);
-            updateRewardRangeDisplay();
-
-            const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-            
-            newGameButton.classList.add('hidden');
-
-            if (!isCurrentDifficultyUnlockedState || !isGameInProgress) {
-                guessButton.disabled = true;
-                guessButton.classList.add('bg-gray-400');
-                guessButton.classList.remove('bg-green-500', 'hover:bg-green-600');
-            } else {
-                guessButton.disabled = false;
-                guessButton.classList.remove('bg-gray-400');
-                guessButton.classList.add('bg-green-500', 'hover:bg-green-600');
-            }
-
-            guessInputContainer.querySelectorAll('.digit-picker').forEach((picker, index) => {
-                const upButton = picker.querySelector('.up-arrow');
-                const downButton = picker.querySelector('.down-arrow');
-                const hintButton = picker.querySelector('.hint-button');
-                const digitDisplay = picker.querySelector('.digit-display');
-
-                const isDigitLockedOrRevealed = revealedDigits.has(index) || lockedDigits.has(index);
-                
-                upButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed;
-                downButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed;
-                digitDisplay.style.cursor = (!isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed) ? 'default' : 'pointer';
-
-                hintButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed;
-                
-                if (isDigitLockedOrRevealed) {
-                    digitDisplay.textContent = revealedDigits.has(index) ? revealedDigits.get(index) : lockedDigits.get(index);
-                    digitDisplay.classList.add('correct');
-                    hintButton.classList.add('revealed');
-                    hintButton.textContent = digitDisplay.textContent;
-                } else {
-                    digitDisplay.textContent = gameLogic.currentGuess[index];
-                    digitDisplay.classList.remove('correct');
-                    hintButton.classList.remove('revealed');
-                    hintButton.textContent = '?';
-                }
-            });
+            bestTimeDisplay.textContent = currentStats.bestTime === Infinity ? '00:00' : formatTime(currentStats.bestTime);
         }
 
-        function displayHints(hints, rules) {
-            console.log("[Hints] Displaying hints:", hints, rules);
-            hintsContainer.innerHTML = `<p class="text-base font-semibold mb-2 text-gray-700">${translate('hints_title')}</p>`;
-            const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
+        function updateMessageDisplay(attemptsLeft) {
+            if (!isGameInProgress && gameLogic.getSecretCode()) { // Game not started yet or reset
+                messageDisplay.textContent = translate('guess_code_message', { codeLength: gameLogic.getCodeLength() });
+            } else if (attemptsLeft > 0) {
+                messageDisplay.textContent = translate('attempts_left', { attempts: attemptsLeft });
+            } else {
+                messageDisplay.textContent = translate('no_attempts_left');
+            }
+            messageDisplay.classList.remove('text-green-600', 'text-red-600', 'text-blue-600');
+            messageDisplay.classList.add('text-gray-600');
+        }
 
-            if (hints.length > 0) {
-                hints.forEach((hint, index) => {
-                    const ruleTranslationKey = (rules[index] && rules[index].translationKey) ? rules[index].translationKey : 'common_rule_description';
-                    const ruleDescription = translate(ruleTranslationKey);
+        function updateInputDisplay(guess) {
+            guessInputContainer.innerHTML = ''; // Clear previous digits
+            const codeLength = gameLogic.getCodeLength();
+            for (let i = 0; i < codeLength; i++) {
+                const digitPicker = document.createElement('div');
+                digitPicker.className = 'digit-picker';
 
-                    const hintItem = document.createElement('p');
+                const arrowUp = document.createElement('button');
+                arrowUp.className = 'arrow-button';
+                arrowUp.textContent = '▲';
+                arrowUp.onclick = () => {
+                    incrementDigit(i);
+                    playSound('click'); // Play sound on click
+                };
+
+                const digitDisplay = document.createElement('div');
+                digitDisplay.className = 'digit-display';
+                digitDisplay.id = `digit-${i}`;
+                digitDisplay.textContent = guess[i];
+
+                const arrowDown = document.createElement('button');
+                arrowDown.className = 'arrow-button';
+                arrowDown.textContent = '▼';
+                arrowDown.onclick = () => {
+                    decrementDigit(i);
+                    playSound('click'); // Play sound on click
+                };
+
+                const hintButton = document.createElement('button');
+                hintButton.className = 'hint-button';
+                hintButton.id = `hint-button-${i}`;
+                hintButton.textContent = '?';
+                hintButton.onclick = () => {
+                    showHintModal(i);
+                    playSound('click'); // Play sound on click
+                };
+
+                digitPicker.appendChild(arrowUp);
+                digitPicker.appendChild(digitDisplay);
+                digitPicker.appendChild(arrowDown);
+                digitPicker.appendChild(hintButton);
+                guessInputContainer.appendChild(digitPicker);
+            }
+        }
+
+        function updateHintsDisplay() {
+            hintsContainer.innerHTML = `<p class="text-base font-semibold mb-2 text-gray-700" data-translate="hints_title">${translate('hints_title')}:</p>`;
+            if (gameLogic.currentHints && gameLogic.currentHints.length > 0) {
+                gameLogic.currentHints.forEach((hint, index) => {
+                    const hintItem = document.createElement('div');
                     hintItem.className = 'hint-item';
-                    hintItem.textContent = `${hint} — ${ruleDescription}`;
+                    const rule = gameLogic.currentHintRules[index];
+                    const hintText = translate(rule.translationKey, { hint: hint });
+                    hintItem.innerHTML = hintText;
                     hintsContainer.appendChild(hintItem);
                 });
             } else {
-                hintsContainer.innerHTML += `<p class="hint-item">${translate('no_hints_available')}</p>`;
+                const noHintsMessage = document.createElement('p');
+                noHintsMessage.className = 'text-sm text-gray-500';
+                noHintsMessage.textContent = translate('no_hints_available');
+                hintsContainer.appendChild(noHintsMessage);
             }
+        }
+
+
+        function updateRewardRangeDisplay() {
+            const currentDiff = Difficulty[currentDifficultyKey];
+            if (currentDiff) {
+                rewardRangeDisplay.textContent = `${translate('reward')}: ${currentDiff.rewardRange.min}-${currentDiff.rewardRange.max} SCG`;
+            } else {
+                rewardRangeDisplay.textContent = '';
+            }
+        }
+
+        // --- Game Logic Functions ---
+        let gameLogic = new GameLogic(Difficulty.NORMAL);
+
+        function incrementDigit(index) {
+            if (!isGameInProgress) return;
+            let digit = parseInt(gameLogic.currentGuess[index], 10);
+            digit = (digit + 1) % 10;
+            gameLogic.currentGuess[index] = digit.toString();
+            document.getElementById(`digit-${index}`).textContent = gameLogic.currentGuess[index];
+        }
+
+        function decrementDigit(index) {
+            if (!isGameInProgress) return;
+            let digit = parseInt(gameLogic.currentGuess[index], 10);
+            digit = (digit - 1 + 10) % 10;
+            gameLogic.currentGuess[index] = digit.toString();
+            document.getElementById(`digit-${index}`).textContent = gameLogic.currentGuess[index];
+        }
+
+        function checkGuess() {
+            if (!isGameInProgress) return;
+            playSound('guess_attempt'); // Play sound on guess
+
+            const currentGuessString = gameLogic.currentGuess.join('');
+            const result = gameLogic.makeGuess(currentGuessString);
+            updateMessageDisplay(result.attemptsLeft);
+
+            // Update digit colors based on correctness for visual feedback
+            const correctlyPlacedIndices = gameLogic.calculateCorrectlyPlacedDigits(gameLogic.currentGuess, gameLogic.getSecretCode().split(''));
+            for (let i = 0; i < gameLogic.getCodeLength(); i++) {
+                const digitDisplay = document.getElementById(`digit-${i}`);
+                if (correctlyPlacedIndices.includes(i)) {
+                    digitDisplay.classList.add('correct');
+                    if (currentDifficultyKey === 'NORMAL') {
+                        lockedDigits.set(i, parseInt(gameLogic.currentGuess[i], 10));
+                        disableDigitPickers(i);
+                    }
+                } else {
+                    digitDisplay.classList.remove('correct');
+                }
+            }
+
+
+            if (result.isWin) {
+                endGame(true, result.reward);
+                playSound('win'); // Play sound on win
+            } else if (result.isGameOver) {
+                endGame(false);
+                playSound('lose'); // Play sound on lose
+            } else {
+                // If not a win or game over, clear the guess for the next attempt,
+                // but keep revealed/locked digits
+                gameLogic.currentGuess = Array(gameLogic.getCodeLength()).fill('0');
+                updateInputDisplay(gameLogic.currentGuess); // Redraw input to clear non-locked digits
+                applyRevealedAndLockedDigits();
+            }
+        }
+
+        function endGame(isWin, reward = 0) {
+            isGameInProgress = false;
+            clearInterval(timerInterval);
+            guessButton.classList.add('hidden');
+            newGameButton.classList.remove('hidden');
+            solutionDisplay.classList.remove('hidden');
+            gameEndButtons.classList.remove('hidden');
+            hintsBoughtThisGame = 0;
+            revealedDigits.clear(); // Clear revealed digits on game end
+            lockedDigits.clear(); // Clear locked digits on game end
+
+            // Disable all digit pickers and hint buttons
+            for (let i = 0; i < gameLogic.getCodeLength(); i++) {
+                disableDigitPickers(i);
+                document.getElementById(`hint-button-${i}`).disabled = true;
+            }
+
+            if (isWin) {
+                totalCoins += reward;
+                messageDisplay.textContent = translate('win_message', { reward: reward });
+                messageDisplay.classList.remove('text-gray-600', 'text-red-600');
+                messageDisplay.classList.add('text-green-600');
+                solutionDisplay.textContent = translate('code_was', { code: gameLogic.getSecretCode() });
+
+                // Update best time if applicable
+                const currentStats = stats[currentDifficultyKey];
+                currentStats.gamesPlayed++;
+                if (currentElapsedTime < currentStats.bestTime) {
+                    currentStats.bestTime = currentElapsedTime;
+                    Telegram.WebApp.showPopup({
+                        title: translate('new_record_title'),
+                        message: translate('new_record_message'),
+                        buttons: [{ id: 'ok', type: 'ok' }]
+                    });
+                }
+            } else {
+                messageDisplay.textContent = translate('lose_message');
+                messageDisplay.classList.remove('text-gray-600', 'text-green-600');
+                messageDisplay.classList.add('text-red-600');
+                solutionDisplay.textContent = translate('code_was', { code: gameLogic.getSecretCode() });
+
+                const currentStats = stats[currentDifficultyKey];
+                currentStats.gamesPlayed++;
+
+                // Initiate coin recovery if totalCoins is zero for NORMAL difficulty
+                if (currentDifficultyKey === 'NORMAL' && totalCoins === 0) {
+                    startCoinRecovery();
+                } else if (totalCoins < 0) {
+                    // For HARD/CRAZY, if coins go negative, set them to zero and show a message
+                    totalCoins = 0;
+                    Telegram.WebApp.showAlert(translate('out_of_coins_message'));
+                }
+            }
+            saveGameData();
+            updateStatsDisplay();
+            checkAndUnlockDifficulties();
+            populateDifficultySelector(); // Re-populate to update unlocked state
+        }
+
+        function resetGame() {
+            playSound('new_game'); // Play sound on new game
+
+            // Check if difficulty is unlocked
+            if (!unlockedDifficulties[currentDifficultyKey]) {
+                const unlockCost = UNLOCK_COSTS[currentDifficultyKey];
+                Telegram.WebApp.showAlert(translate('difficulty_locked_message', { cost: unlockCost, difficulty: translate(Difficulty[currentDifficultyKey].displayNameKey) }));
+                return;
+            }
+
+            // Check if current coins are enough for HARD/CRAZY and not NORMAL (NORMAL has recovery)
+            if (currentDifficultyKey !== 'NORMAL' && totalCoins < 0) {
+                Telegram.WebApp.showAlert(translate('not_enough_coins_to_play_message'));
+                return;
+            }
+
+            const gameResetResult = gameLogic.resetGame(); // This sets secretCode, hints, etc.
+            isGameInProgress = true;
+            hintsBoughtThisGame = 0;
+            revealedDigits.clear();
+            lockedDigits.clear(); // Clear locked digits for new game
+
+            gameLogic.currentGuess = Array(gameLogic.getCodeLength()).fill('0');
+            updateInputDisplay(gameLogic.currentGuess);
+            updateHintsDisplay();
+
+            solutionDisplay.textContent = '';
+            guessButton.classList.remove('hidden');
+            newGameButton.classList.add('hidden');
+            solutionDisplay.classList.add('hidden');
+            gameEndButtons.classList.add('hidden');
+
+            startTimer();
+            updateStatsDisplay();
+            updateMessageDisplay(gameLogic.getAttemptsLeft()); // Initial message
+            enableAllDigitPickers(); // Re-enable all pickers for a new game
+            enableAllHintButtons(); // Re-enable all hint buttons
+            Telegram.WebApp.MainButton.hide(); // Hide main button if it was shown
         }
 
         function startTimer() {
@@ -1493,108 +1279,257 @@
             }, 1000);
         }
 
-        function stopTimer() {
-            clearInterval(timerInterval);
-        }
-
-        guessButton.addEventListener('click', checkGuess);
-        newGameButton.addEventListener('click', resetGame);
-        modalCancelButton.addEventListener('click', () => {
-            hintModalOverlay.classList.add('hidden');
-            activeHintIndex = -1;
-        });
-
-        difficultySelector.addEventListener('change', (event) => {
-            const selectedDifficultyName = event.target.value;
-            if (Difficulty[selectedDifficultyName]) {
-                currentDifficultyKey = selectedDifficultyName;
-                gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-                console.log(`[Difficulty Selector] Changed difficulty to: ${translate(Difficulty[currentDifficultyKey].displayNameKey)}`);
-                
-                resetGame();
-            } else {
-                console.error(`[Difficulty Selector] Unknown difficulty selected: ${selectedDifficultyName}`);
-            }
-        });
-
-        languageSelector.addEventListener('change', async (event) => {
-            const selectedLang = event.target.value;
-            if (supportedLanguages[selectedLang]) {
-                await loadTranslations(selectedLang);
-                applyTranslations();
-                gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-                resetGame();
-                console.log(`[Language Selector] Language changed to: ${supportedLanguages[selectedLang]}`);
-            } else {
-                console.error(`[Language Selector] Unsupported language selected: ${selectedLang}`);
-            }
-        });
-
-        themeSelector.addEventListener('change', (event) => {
-            applyTheme(event.target.value);
-        });
-
-        soundToggle.addEventListener('change', (event) => {
-            toggleSound(event.target.checked);
-        });
-
         function populateDifficultySelector() {
-            console.log("[Difficulty Selector] Populating difficulty selector...");
-            difficultySelector.innerHTML = '';
+            difficultySelector.innerHTML = ''; // Clear existing options
             for (const key in Difficulty) {
-                if (Object.prototype.hasOwnProperty.call(Difficulty, key) &&
+                if (Object.hasOwnProperty.call(Difficulty, key) &&
                     typeof Difficulty[key] === 'object' &&
                     Difficulty[key] !== null &&
-                    Difficulty[key].displayNameKey) {
+                    Difficulty[key].displayNameKey) { // Check for displayNameKey
                     const option = document.createElement('option');
                     option.value = key;
-                    
-                    let optionText = translate(Difficulty[key].displayNameKey);
-
-                    if (key !== 'NORMAL') {
-                        const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
-                        optionText = `${optionText} x${multiplier} SCG`;
+                    option.textContent = translate(Difficulty[key].displayNameKey);
+                    if (!unlockedDifficulties[key]) {
+                        option.disabled = true;
+                        option.textContent += ` (${translate('unlock_cost', { cost: UNLOCK_COSTS[key] })})`;
                     }
-                    
-                    option.textContent = optionText;
                     difficultySelector.appendChild(option);
                 } else {
                     console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
                 }
             }
+            // Set the selector value based on currentDifficultyKey
             difficultySelector.value = currentDifficultyKey;
-            updateRewardRangeDisplay();
             console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
         }
 
-        function populateLanguageSelector() {
-            console.log("[Language Selector] Populating language selector...");
-            languageSelector.innerHTML = '';
-            for (const langCode in supportedLanguages) {
-                const option = document.createElement('option');
-                option.value = langCode;
-                option.textContent = supportedLanguages[langCode];
-                languageSelector.appendChild(option);
+        function handleDifficultyChange() {
+            const selectedDifficultyKey = difficultySelector.value;
+            if (selectedDifficultyKey === currentDifficultyKey) {
+                return; // No change
             }
-            languageSelector.value = currentLanguage;
-            console.log("[Language Selector] Selector value set to:", currentLanguage);
+
+            if (!unlockedDifficulties[selectedDifficultyKey]) {
+                const unlockCost = UNLOCK_COSTS[selectedDifficultyKey];
+                showUnlockDifficultyModal(selectedDifficultyKey, unlockCost);
+                // Reset selector to previous value until unlocked or cancelled
+                difficultySelector.value = currentDifficultyKey;
+                return;
+            }
+
+            currentDifficultyKey = selectedDifficultyKey;
+            gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
+            saveGameData(); // Save new difficulty
+            resetGame(); // Start new game with new difficulty
+            updateRewardRangeDisplay();
         }
 
-        function updateRewardRangeDisplay() {
-            rewardRangeDisplay.textContent = '';
+        function showUnlockDifficultyModal(difficultyKeyToUnlock, cost) {
+            modalMessage.textContent = translate('unlock_difficulty_confirm', { cost: cost, difficulty: translate(Difficulty[difficultyKeyToUnlock].displayNameKey) });
+            modalConfirmButton.textContent = translate('confirm_button');
+            modalConfirmButton.onclick = () => confirmUnlockDifficulty(difficultyKeyToUnlock, cost);
+            hintModalOverlay.classList.remove('hidden');
         }
 
+        function confirmUnlockDifficulty(difficultyKeyToUnlock, cost) {
+            if (totalCoins >= cost) {
+                totalCoins -= cost;
+                unlockedDifficulties[difficultyKeyToUnlock] = true;
+                currentDifficultyKey = difficultyKeyToUnlock; // Set new difficulty
+                gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
+                saveGameData();
+                populateDifficultySelector(); // Update options
+                resetGame(); // Start game with newly unlocked difficulty
+                Telegram.WebApp.showAlert(translate('difficulty_unlocked_success', { difficulty: translate(Difficulty[difficultyKeyToUnlock].displayNameKey) }));
+                updateRewardRangeDisplay();
+            } else {
+                Telegram.WebApp.showAlert(translate('not_enough_coins_to_unlock', { cost: cost }));
+            }
+            hintModalOverlay.classList.add('hidden');
+        }
+
+
+        function showHintModal(digitIndex) {
+            activeHintIndex = digitIndex;
+            const currentDiff = Difficulty[currentDifficultyKey];
+            const hintCost = gameLogic.getHintCost();
+            currentHintCost = hintCost; // Store for confirmation
+
+            modalMessage.textContent = translate('buy_hint_confirm', { cost: hintCost });
+            modalConfirmButton.textContent = translate('confirm_button');
+            modalConfirmButton.onclick = confirmHintPurchase;
+            hintModalOverlay.classList.remove('hidden');
+        }
+
+        function confirmHintPurchase() {
+            if (totalCoins >= currentHintCost) {
+                totalCoins -= currentHintCost;
+                hintsBoughtThisGame++;
+                const secretDigit = gameLogic.getSecretCode()[activeHintIndex];
+                revealedDigits.set(activeHintIndex, parseInt(secretDigit, 10));
+                lockedDigits.set(activeHintIndex, parseInt(secretDigit, 10)); // Also lock the revealed digit
+
+                document.getElementById(`digit-${activeHintIndex}`).textContent = secretDigit;
+                document.getElementById(`digit-${activeHintIndex}`).classList.add('correct');
+                disableDigitPickers(activeHintIndex); // Disable input for revealed digit
+                document.getElementById(`hint-button-${activeHintIndex}`).classList.add('revealed');
+                document.getElementById(`hint-button-${activeHintIndex}`).disabled = true;
+
+                updateStatsDisplay();
+                saveGameData();
+                playSound('hint_bought'); // Play sound for hint purchase
+                Telegram.WebApp.showAlert(translate('hint_purchased'));
+
+            } else {
+                Telegram.WebApp.showAlert(translate('not_enough_coins_for_hint', { cost: currentHintCost }));
+            }
+            hintModalOverlay.classList.add('hidden');
+            activeHintIndex = -1; // Reset active hint index
+        }
+
+        function disableDigitPickers(index) {
+            document.getElementById(`digit-${index}`).previousElementSibling.disabled = true; // Up arrow
+            document.getElementById(`digit-${index}`).nextElementSibling.disabled = true; // Down arrow
+        }
+
+        function enableAllDigitPickers() {
+            for (let i = 0; i < gameLogic.getCodeLength(); i++) {
+                const upArrow = document.getElementById(`digit-${i}`).previousElementSibling;
+                const downArrow = document.getElementById(`digit-${i}`).nextElementSibling;
+                if (upArrow) upArrow.disabled = false;
+                if (downArrow) downArrow.disabled = false;
+            }
+        }
+
+        function enableAllHintButtons() {
+            for (let i = 0; i < gameLogic.getCodeLength(); i++) {
+                const hintButton = document.getElementById(`hint-button-${i}`);
+                if (hintButton) {
+                    hintButton.disabled = false;
+                    hintButton.classList.remove('revealed');
+                }
+            }
+        }
+
+
+        function applyRevealedAndLockedDigits() {
+            for (let i = 0; i < gameLogic.getCodeLength(); i++) {
+                if (revealedDigits.has(i)) {
+                    const revealedVal = revealedDigits.get(i);
+                    gameLogic.currentGuess[i] = revealedVal.toString();
+                    document.getElementById(`digit-${i}`).textContent = revealedVal.toString();
+                    document.getElementById(`digit-${i}`).classList.add('correct');
+                    document.getElementById(`hint-button-${i}`).classList.add('revealed');
+                    document.getElementById(`hint-button-${i}`).disabled = true;
+                    disableDigitPickers(i);
+                } else if (lockedDigits.has(i)) { // Apply locked digits if any (from Normal mode incorrect guesses)
+                    const lockedVal = lockedDigits.get(i);
+                    gameLogic.currentGuess[i] = lockedVal.toString();
+                    document.getElementById(`digit-${i}`).textContent = lockedVal.toString();
+                    document.getElementById(`digit-${i}`).classList.add('correct');
+                    disableDigitPickers(i);
+                } else {
+                    // For non-revealed/non-locked digits, ensure they are enabled
+                    const upArrow = document.getElementById(`digit-${i}`).previousElementSibling;
+                    const downArrow = document.getElementById(`digit-${i}`).nextElementSibling;
+                    const hintButton = document.getElementById(`hint-button-${i}`);
+                    if (upArrow) upArrow.disabled = false;
+                    if (downArrow) downArrow.disabled = false;
+                    if (hintButton) {
+                        hintButton.disabled = false;
+                        hintButton.classList.remove('revealed');
+                    }
+                    document.getElementById(`digit-${i}`).classList.remove('correct'); // Ensure no lingering 'correct' class
+                }
+            }
+        }
+
+        function checkAndUnlockDifficulties() {
+            if (totalCoins >= UNLOCK_COSTS.HARD && !unlockedDifficulties.HARD) {
+                unlockedDifficulties.HARD = true;
+                saveGameData();
+                Telegram.WebApp.showPopup({
+                    title: translate('new_difficulty_unlocked_title'),
+                    message: translate('hard_difficulty_unlocked_message'),
+                    buttons: [{ id: 'ok', type: 'ok' }]
+                });
+            }
+            if (totalCoins >= UNLOCK_COSTS.CRAZY && !unlockedDifficulties.CRAZY) {
+                unlockedDifficulties.CRAZY = true;
+                saveGameData();
+                Telegram.WebApp.showPopup({
+                    title: translate('new_difficulty_unlocked_title'),
+                    message: translate('crazy_difficulty_unlocked_message'),
+                    buttons: [{ id: 'ok', type: 'ok' }]
+                });
+            }
+        }
+
+        function startCoinRecovery() {
+            const recoveryAmount = Difficulty.NORMAL.recoveryAmount;
+            const recoveryTime = Difficulty.NORMAL.recoveryTime; // seconds
+            coinRecoveryCountdownSeconds = recoveryTime;
+
+            recoveryModalMessage.textContent = translate('coin_recovery_message', { amount: recoveryAmount, time: recoveryTime });
+            recoveryCountdown.textContent = formatTime(coinRecoveryCountdownSeconds);
+            recoveryOkButton.classList.add('hidden');
+            coinRecoveryModalOverlay.classList.remove('hidden');
+
+            const recoveryInterval = setInterval(() => {
+                coinRecoveryCountdownSeconds--;
+                recoveryCountdown.textContent = formatTime(coinRecoveryCountdownSeconds);
+
+                if (coinRecoveryCountdownSeconds <= 0) {
+                    clearInterval(recoveryInterval);
+                    totalCoins += recoveryAmount;
+                    saveGameData();
+                    updateStatsDisplay();
+                    recoveryCountdown.textContent = translate('recovery_complete');
+                    recoveryOkButton.classList.remove('hidden');
+                    playSound('coins_recovered'); // Play sound for coin recovery
+                }
+            }, 1000);
+        }
+
+        // --- Event Listeners ---
+        guessButton.addEventListener('click', checkGuess);
+        newGameButton.addEventListener('click', resetGame);
+        modalCancelButton.addEventListener('click', () => {
+            hintModalOverlay.classList.add('hidden');
+            activeHintIndex = -1; // Reset active hint index
+        });
+        recoveryOkButton.addEventListener('click', () => {
+            coinRecoveryModalOverlay.classList.add('hidden');
+        });
+        difficultySelector.addEventListener('change', handleDifficultyChange);
+        languageSelector.addEventListener('change', (event) => {
+            currentLanguage = event.target.value;
+            saveGameData();
+            loadTranslations(currentLanguage);
+        });
+        themeSelector.addEventListener('change', (event) => {
+            applyTheme(event.target.value);
+        });
+        soundToggle.addEventListener('change', (event) => {
+            toggleSound(event.target.checked);
+        });
+
+        // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
-            loadGameData();
-            applyTheme(currentTheme);
-            populateThemeSelector();
-            soundToggle.checked = soundEnabled;
-            populateLanguageSelector();
-            populateDifficultySelector();
+            loadGameData(); // Load all stats and language, theme, sound preference
 
+            applyTheme(currentTheme); // Apply loaded theme
+            populateThemeSelector(); // Set theme selector to loaded value
+            soundToggle.checked = soundEnabled; // Set sound toggle to loaded value
+
+            populateLanguageSelector(); // Populate language selector based on supported languages
+            populateDifficultySelector(); // Populate difficulty selector with translated names
+
+            // Load translations first, then proceed with game setup
             await loadTranslations(currentLanguage);
 
+            // Check and update unlocked difficulties based on totalCoins
             if (totalCoins >= UNLOCK_COSTS.HARD) {
                 unlockedDifficulties.HARD = true;
             }
@@ -1603,7 +1538,7 @@
             }
 
             console.log("[DOM Loaded] Starting a new game.");
-            resetGame();
+            resetGame(); // This will now correctly handle locked levels by not starting a game.
         });
     </script>
 </body>
