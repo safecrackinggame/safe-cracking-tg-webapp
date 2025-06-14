@@ -54,10 +54,15 @@
         .dark-mode .text-gray-500 {
             color: #a0aec0;
         }
-        .dark-mode .bg-blue-100 { /* For hints */
+        .dark-mode .bg-gray-50 { /* For hints section */
+            background-color: #1f2937;
+            border-color: #4a5568;
+        }
+        .dark-mode .bg-blue-100 { /* For hint items */
             background-color: #3b5a8d;
             color: #d1e0f7;
         }
+
 
         /* Input styling */
         .code-input-container input {
@@ -114,6 +119,8 @@
                 </svg>
             </button>
         </div>
+
+        <select id="languageSelector" class="mb-4 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-200 cursor-pointer w-full max-w-xs"></select>
 
         <div id="stats" class="w-full text-center text-sm font-semibold text-gray-700">
             <p id="totalCoinsDisplay" class="text-xl font-bold text-green-600"></p>
@@ -181,8 +188,7 @@
             'uk': 'Українська',
             'id': 'Bahasa Indonesia'
         };
-        // Use Telegram WebApp language code if available, otherwise 'en', then fallback to localStorage
-        let currentLanguage = localStorage.getItem('language') || (Telegram.WebApp.initDataUnsafe.user && Telegram.WebApp.initDataUnsafe.user.language_code) || 'en';
+        let currentLanguage = localStorage.getItem('language') || (Telegram.WebApp.initDataUnsafe.user && Telegram.WebApp.initDataUnsafe.user.language_code) || 'en'; // Default language
 
         // --- Game Configuration ---
         const CODE_LENGTH = 4; // This will be overridden by Difficulty settings
@@ -242,7 +248,7 @@
             HARD: false,
             CRAZY: false
         };
-        let isSoundEnabled = localStorage.getItem('isSoundEnabled') === 'true'; // Default to true if not set
+        let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? (localStorage.getItem('isSoundEnabled') === 'true') : true; // Default to TRUE if not set
         let isDarkMode = localStorage.getItem('isDarkMode') === 'true'; // Default to false if not set
 
         // --- DOM Elements ---
@@ -267,6 +273,7 @@
         const newGameButtonText = document.getElementById('newGameButtonText');
         const difficultySelector = document.getElementById('difficultySelector');
         const difficultyLockedMessage = document.getElementById('difficultyLockedMessage');
+        const languageSelector = document.getElementById('languageSelector'); // Your existing language selector
 
         // New UI Elements
         const themeLightBtn = document.getElementById('themeLightBtn');
@@ -295,7 +302,7 @@
                     console.warn('[Localization] Falling back to English.');
                     currentLanguage = 'en';
                     localStorage.setItem('language', 'en');
-                    loadTranslations('en'); // Try loading English
+                    await loadTranslations('en'); // Recursively call for English
                 }
             }
         }
@@ -521,17 +528,18 @@
                 let hintMessage = '';
 
                 // These rules might need refinement based on exact game logic
-                if (correctPosition === currentDiff.codeLength - 1 && correctDigit === 0) { // All but one in place, none correct but wrong position
-                    hintMessage = translate('hint_rule_3_2'); // Example: Three correct digits, two in correct positions (This needs specific rules from user)
+                if (correctPosition === currentDiff.codeLength && correctDigit === 0) { // All correct, all in place
+                    hintMessage = translate('hint_rule_perfect'); // This case shouldn't be reached as it's a win
                 } else if (correctPosition > 0 && correctDigit > 0) {
-                    hintMessage = translate('hint_rule_2_1'); // Example: Two correct, one in place
-                } else if (correctDigit > 0 && correctPosition === 0) {
-                    hintMessage = translate('hint_rule_2_0'); // Example: Two correct, none in place
+                    hintMessage = translate('hint_rule_bulls_and_cows', { correctPosition: correctPosition, correctDigit: correctDigit });
                 } else if (correctPosition > 0) {
-                    hintMessage = translate('hint_rule_1_1'); // Example: One correct, in place
+                    hintMessage = translate('hint_rule_bulls', { correctPosition: correctPosition });
+                } else if (correctDigit > 0) {
+                    hintMessage = translate('hint_rule_cows', { correctDigit: correctDigit });
                 } else {
                     hintMessage = translate('incorrect_guess_message', { attemptsLeft: attemptsLeft });
                 }
+
 
                 messageDisplay.textContent = hintMessage;
                 clearInputs();
@@ -539,8 +547,8 @@
         }
 
         function analyzeGuess(guessArr) {
-            let correctPosition = 0;
-            let correctDigit = 0; // Correct digit but wrong position
+            let correctPosition = 0; // "Bulls"
+            let correctDigit = 0; // "Cows" - correct digit, wrong position
 
             // Create a temporary copy of secretCode to mark used digits for 'correctDigit' calculation
             const tempSecret = [...secretCode];
@@ -657,7 +665,7 @@
                 // Add hint to list
                 const hintItem = document.createElement('p');
                 hintItem.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full');
-                hintItem.textContent = `Подсказка: Цифра на позиции ${randomIndex + 1} - это ${secretCode[randomIndex]}.`; // Placeholder, should be translated
+                hintItem.textContent = translate('hint_revealed_digit', { position: randomIndex + 1, digit: secretCode[randomIndex] });
                 if (hintsList.querySelector('#noHintsMessage')) {
                     hintsList.innerHTML = ''; // Clear "no hints" message
                 }
@@ -670,7 +678,7 @@
         function updateBuyHintButton() {
             const currentDiff = Difficulty[currentDifficultyKey];
             const hintCost = currentDiff.hintCost;
-            buyHintButton.textContent = `${translate('buy_button')} (${hintCost} SCG)`; // Removed 'hint' from translate key
+            buyHintButton.textContent = `${translate('buy_hint_button')} (${hintCost} SCG)`;
             if (hintsUsed >= MAX_HINTS_PER_GAME) {
                 buyHintButton.disabled = true;
                 buyHintButton.textContent = translate('hint_max_limit_message');
@@ -678,7 +686,6 @@
                 buyHintButton.disabled = false;
             }
         }
-
 
         function checkAndUnlockDifficulty() {
             const newLevelsUnlocked = [];
@@ -727,8 +734,8 @@
             localStorage.setItem('bestTime', bestTime);
             localStorage.setItem('currentDifficulty', currentDifficultyKey);
             localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
-            localStorage.setItem('isSoundEnabled', isSoundEnabled);
-            localStorage.setItem('isDarkMode', isDarkMode);
+            localStorage.setItem('isSoundEnabled', isSoundEnabled); // Save sound preference
+            localStorage.setItem('isDarkMode', isDarkMode); // Save dark mode preference
             console.log("[Game Data] Saved all game data.");
         }
 
@@ -747,20 +754,16 @@
             console.log("[Game Data] Loaded all game data.");
         }
 
-        // Function to populate language selector (assuming you might add one later)
         function populateLanguageSelector() {
-            // This function is present in your code but not called anywhere.
-            // If you decide to add a language selector, you'd populate it here.
-            // const languageSelector = document.getElementById('languageSelector');
-            // if (!languageSelector) return;
-            // languageSelector.innerHTML = '';
-            // for (const langCode in supportedLanguages) {
-            //     const option = document.createElement('option');
-            //     option.value = langCode;
-            //     option.textContent = supportedLanguages[langCode];
-            //     languageSelector.appendChild(option);
-            // }
-            // languageSelector.value = currentLanguage;
+            languageSelector.innerHTML = ''; // Clear previous options
+            for (const langCode in supportedLanguages) {
+                const option = document.createElement('option');
+                option.value = langCode;
+                option.textContent = supportedLanguages[langCode];
+                languageSelector.appendChild(option);
+            }
+            languageSelector.value = currentLanguage;
+            console.log("[Language Selector] Selector value set to:", currentLanguage);
         }
 
         function populateDifficultySelector() {
@@ -831,6 +834,7 @@
             console.log(`Sound is now: ${isSoundEnabled ? 'On' : 'Off'}`);
         }
 
+
         // --- Event Listeners ---
         breakButton.addEventListener('click', checkGuess);
         newGameButton.addEventListener('click', () => {
@@ -841,7 +845,7 @@
         buyHintButton.addEventListener('click', buyHint);
 
         // Input field event listeners (re-attached after inputs are recreated by resetGame)
-        // Initial attachment for existing inputs
+        // Initial attachment for existing inputs (important for the first load)
         codeInputs.forEach(input => {
             input.addEventListener('input', handleInput);
             input.addEventListener('keydown', handleKeyDown);
@@ -852,6 +856,14 @@
             localStorage.setItem('currentDifficulty', currentDifficultyKey);
             resetGame(); // Reset game to apply new difficulty
             saveGameData(); // Save selected difficulty
+        });
+
+        languageSelector.addEventListener('change', async (event) => {
+            currentLanguage = event.target.value;
+            localStorage.setItem('language', currentLanguage);
+            await loadTranslations(currentLanguage); // Reload translations
+            resetGame(); // Reset game to apply new language messages to game state
+            saveGameData(); // Save new language
         });
 
         // New Event Listeners for Theme and Sound
@@ -871,7 +883,7 @@
 
             await loadTranslations(currentLanguage); // Load translations first
 
-            // populateLanguageSelector(); // Uncomment if you add a language selector
+            populateLanguageSelector(); // Populate language selector based on supported languages
             populateDifficultySelector(); // Populate difficulty selector with translated names
 
             // Check and update unlocked difficulties based on totalCoins
@@ -882,6 +894,7 @@
             if (totalCoins >= UNLOCK_COSTS.CRAZY) {
                 unlockedDifficulties.CRAZY = true;
             }
+            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties)); // Save any new unlocks from load
 
             console.log("[DOM Loaded] Starting a new game.");
             resetGame(); // This will now correctly handle locked levels by not starting a game.
