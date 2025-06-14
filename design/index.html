@@ -381,13 +381,13 @@
                         <path d="M3,9v6h4l5,5V4L7,9H3z"/>
                     </svg>
                 </button>
+                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
             <div class="settings-bar">
                 <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
             </div>
             <div class="settings-bar">
-                <select id="language-selector" class="p-2 border rounded-lg shadow-sm w-fit"></select>
-                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
+                <select id="language-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
         
@@ -1568,10 +1568,10 @@
 
                     if (key !== 'NORMAL') {
                         const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
-                        optionText = `${optionText} x${multiplier} SCG`;
+                        optionText += ` x${multiplier} SCG`; // Исправлено: += для уникального добавления множителя
                     }
                     
-                    option.textContent = optionText;
+                    option.textContent = optionText.trim(); // Удаляем лишние пробелы
                     difficultySelector.appendChild(option);
                 } else {
                     console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
