@@ -1012,7 +1012,7 @@
                 const resetResult = gameLogic.resetGame();
                 if (resetResult.secretCode === "") {
                     showMessage(translate('puzzle_generation_failed'), 'red');
-                    solutionDisplay.textContent = '****'; // Скрываем код
+                    solutionDisplay.textContent = ''; // Скрываем код
                     guessButton.disabled = true;
                     isGameInProgress = false;
                     console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
@@ -1021,7 +1021,7 @@
                     return;
                 }
                 showMessage(translate('guess_code_message', {codeLength: gameLogic.codeLength}) + ' ' + translate('attempts_left_message', {attemptsLeft: gameLogic.getAttemptsLeft()}), 'default');
-                solutionDisplay.textContent = '****'; // Скрываем код
+                solutionDisplay.textContent = ''; // Скрываем код
                 newGameButton.classList.add('hidden'); // Hide "New Game" button
 
                 displayHints(gameLogic.currentHints, gameLogic.currentHintRules); // Display hints for unlocked levels
@@ -1032,7 +1032,7 @@
                 isGameInProgress = false; // Game is not in progress
                 const requiredCoins = UNLOCK_COSTS[currentDifficultyKey];
                 showMessage(translate('difficulty_locked', {difficultyName: translate(Difficulty[currentDifficultyKey].displayNameKey), cost: requiredCoins}), 'red');
-                solutionDisplay.textContent = '****'; // Скрываем код
+                solutionDisplay.textContent = ''; // Скрываем код
                 newGameButton.classList.add('hidden'); // Keep new game hidden
 
                 // Generate and display hints even if locked, but the hint buttons will be disabled
@@ -1089,7 +1089,7 @@
                 saveGameData();
 
                 showMessage(translate('safe_cracked_win', {earnedCoins: earnedCoins}), 'green');
-                solutionDisplay.textContent = '****'; // Скрываем код
+                solutionDisplay.textContent = ''; // Скрываем код
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden'); // Show "New Game" button
                 Telegram.WebApp.showPopup({
@@ -1107,7 +1107,7 @@
                 saveGameData();
 
                 showMessage(translate('game_over_message', {secretCode: gameLogic.getSecretCode()}), 'red');
-                solutionDisplay.textContent = '****'; // Скрываем код
+                solutionDisplay.textContent = ''; // Скрываем код
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden'); // Show "New Game" button
                 Telegram.WebApp.showPopup({
