@@ -381,12 +381,12 @@
                         <path d="M3,9v6h4l5,5V4L7,9H3z"/>
                     </svg>
                 </button>
-                <select id="language-selector" class="p-2 border rounded-lg shadow-sm w-fit"></select>
             </div>
             <div class="settings-bar">
                 <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
             </div>
             <div class="settings-bar">
+                <select id="language-selector" class="p-2 border rounded-lg shadow-sm w-fit"></select>
                 <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
@@ -1568,7 +1568,7 @@
 
                     if (key !== 'NORMAL') {
                         const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
-                        optionText += ` x${multiplier} SCG`; // Исправлено: += вместо =, чтобы избежать дублирования
+                        optionText = `${optionText} x${multiplier} SCG`;
                     }
                     
                     option.textContent = optionText;
