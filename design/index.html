@@ -238,7 +238,7 @@
             background-size: 1.25rem;
             cursor: pointer;
             outline: none;
-            min-width: 150px;
+            min-width: 120px;
         }
         .dark-mode select {
             border-color: #4a5568;
@@ -320,6 +320,16 @@
             gap: 0.5rem;
             flex-wrap: nowrap;
         }
+        .settings-bar:nth-child(1) {
+            justify-content: flex-start;
+        }
+        .settings-bar:nth-child(2) {
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .settings-bar:nth-child(3) {
+            justify-content: flex-end;
+        }
         .theme-toggle-btn, .sound-toggle-btn {
             padding: 0.5rem;
             border-radius: 9999px;
@@ -351,10 +361,6 @@
     <div class="game-container">
         <div class="top-bar">
             <div class="settings-bar">
-                <div class="logo-placeholder"></div>
-                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
-            </div>
-            <div class="settings-bar">
                 <button id="theme-toggle-btn" class="theme-toggle-btn">
                     <svg id="theme-sun-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="5" fill="currentColor"/>
@@ -364,7 +370,6 @@
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
                     </svg>
                 </button>
-                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
                 <button id="sound-toggle-btn" class="sound-toggle-btn">
                     <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
@@ -378,7 +383,11 @@
                 </button>
             </div>
             <div class="settings-bar">
+                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+            </div>
+            <div class="settings-bar">
                 <select id="language-selector" class="p-2 border rounded-lg shadow-sm w-fit"></select>
+                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
         
