@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safe Cracking TG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; /* Используем Inter, как рекомендовано */
+            background-color: #f0f4f8; /* Легкий серый фон */
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+            transition: background-color 0.3s, color 0.3s; /* Плавный переход при смене темы */
+        }
+        .game-container {
+            width: 100%;
+            max-width: 420px; /* Максимальная ширина для мобильных устройств */
+            padding: 1rem;
+            background-color: #ffffff;
+            border-radius: 1.5rem; /* Скругленные углы */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem; /* Отступы между элементами */
+            transition: background-color 0.3s, box-shadow 0.3s; /* Плавный переход при смене темы */
+        }
+
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background-color: #1a202c; /* Темный фон */
+            color: #e2e8f0; /* Светлый текст */
+        }
+        .game-container.dark-mode {
+            background-color: #2d3748; /* Более темный фон контейнера */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+        .dark-mode .text-gray-700 {
+            color: #cbd5e0; /* Светлее для темного режима */
+        }
+        .dark-mode .bg-gray-200 {
+            background-color: #4a5568; /* Темнее для темного режима */
+        }
+        .dark-mode .bg-white {
+             background-color: #2d3748; /* Темнее для темного режима */
+        }
+        .dark-mode .text-gray-500 {
+            color: #a0aec0;
+        }
+        .dark-mode .bg-gray-50 { /* For hints section */
+            background-color: #1f2937;
+            border-color: #4a5568;
+        }
+        .dark-mode .bg-blue-100 { /* For hint items */
+            background-color: #3b5a8d;
+            color: #d1e0f7;
+        }
+
+
+        /* Input styling */
+        .code-input-container input {
+            -moz-appearance: textfield; /* Firefox */
+        }
+        .code-input-container input::-webkit-outer-spin-button,
+        .code-input-container input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Pulse animation for buttons */
+        .pulse-animation {
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-800 bg-gray-100 flex items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="game-container bg-white rounded-2xl shadow-xl p-6 md:p-8 relative">
+
+        <div class="w-full flex items-center justify-between mb-4">
+            <div class="flex space-x-2">
+                <button id="themeLightBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2.5a.5.5 0 01.5.5v1a.5.5 0 01-1 0V3a.5.5 0 01.5-.5zM12 19.5a.5.5 0 01-.5-.5v-1a.5.5 0 011 0v1a.5.5 0 01-.5.5zM3.866 5.134a.5.5 0 01-.354-.854l.708-.708a.5.5 0 01.708.708l-.708.708a.5.5 0 01-.354.146zM19.485 18.985a.5.5 0 01-.354-.146l-.708-.708a.5.5 0 01.708-.708l.708.708a.5.5 0 01-.354.854zM2.5 12a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zM19.5 12a.5.5 0 01.5-.5h1a.5.5 0 010 1h-1a.5.5 0 01-.5-.5zM3.866 18.985a.5.5 0 01-.354-.146l-.708-.708a.5.5 0 01.708-.708l.708.708a.5.5 0 01-.354.854zM19.485 5.134a.5.5 0 01-.354-.854l.708-.708a.5.5 0 01.708.708l-.708.708a.5.5 0 01-.354.146zM12 7a5 5 0 100 10 5 5 0 000-10z"/>
+                    </svg>
+                </button>
+                <button id="themeDarkBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6 text-gray-700 dark:text-purple-300" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3a9 9 0 109 9c0-.46-.03-.92-.1-1.37a.75.75 0 01.62-.83c.7-.13 1.36-.26 2-.43A10.5 10.5 0 0112 22.5c-5.8 0-10.5-4.7-10.5-10.5S6.2 1.5 12 1.5c1.86 0 3.63.48 5.2 1.37a.75.75 0 01.62.83c-.07.45-.1.91-.1 1.37a9 9 0 00-6.7-1.37z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <h1 class="text-3xl font-extrabold text-blue-600">
+                <span id="appTitle"></span>
+            </h1>
+
+            <button id="soundToggleBtn" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200">
+                <svg id="soundOnIcon" class="w-6 h-6 text-gray-700 dark:text-white" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
+                    <path d="M13,6c2,2 2.5,4 2.5,6c0,2 -0.5,4 -2.5,6"/>
+                    <path d="M15,5c2.5,2.5 3,5 3,7c0,2 -0.5,4.5 -3,7"/>
+                    <path d="M17,3c3,3 3.5,6 3.5,9c0,3 -0.5,6 -3.5,9"/>
+                </svg>
+                <svg id="soundOffIcon" class="w-6 h-6 text-gray-700 dark:text-white hidden" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3,9v6h4l5,5V4L7,9H3z" />
+                </svg>
+            </button>
+        </div>
+
+        <select id="languageSelector" class="mb-4 px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-200 cursor-pointer w-full max-w-xs"></select>
+
+        <div id="stats" class="w-full text-center text-sm font-semibold text-gray-700">
+            <p id="totalCoinsDisplay" class="text-xl font-bold text-green-600"></p>
+            <p id="gamesPlayedDisplay"></p>
+            <p id="rewardRangeDisplay" class="text-blue-500"></p>
+            <p id="bestTimeDisplay" class="text-purple-600"></p>
+        </div>
+
+        <div id="gameArea" class="w-full flex flex-col items-center gap-4">
+            <p id="messageDisplay" class="text-lg font-medium text-gray-800 text-center"></p>
+
+            <div class="code-input-container flex space-x-2">
+                <input type="number" class="w-12 h-12 text-center text-2xl font-bold bg-gray-200 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="number" class="w-12 h-12 text-center text-2xl font-bold bg-gray-200 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="number" class="w-12 h-12 text-center text-2xl font-bold bg-gray-200 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" maxlength="1" pattern="[0-9]" inputmode="numeric">
+                <input type="number" class="w-12 h-12 text-center text-2xl font-bold bg-gray-200 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200" maxlength="1" pattern="[0-9]" inputmode="numeric">
+            </div>
+
+            <button id="breakButton" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 transform transition-transform duration-100 active:scale-95">
+                <span id="breakButtonText">Зламати</span>
+            </button>
+
+            <div id="attemptsDisplay" class="text-md text-gray-600 font-medium"></div>
+            <div id="timerDisplay" class="text-md text-gray-600 font-medium"></div>
+
+            <div id="hintsSection" class="w-full mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 id="hintsTitle" class="text-lg font-semibold text-gray-700 mb-2">Підказки:</h3>
+                <div id="hintsList" class="flex flex-wrap gap-2 text-sm text-gray-600">
+                    <p id="noHintsMessage">Немає доступних підказок для цієї гри.</p>
+                </div>
+                <button id="buyHintButton" class="mt-3 bg-green-500 text-white font-semibold py-2 px-6 rounded-full shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transform transition-transform duration-100 active:scale-95">
+                    Купити підказку (50 SCG)
+                </button>
+            </div>
+            
+            <div id="popup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+                <div class="bg-white rounded-lg p-6 shadow-2xl text-center">
+                    <p id="popupMessage" class="text-lg font-semibold mb-4 text-gray-800"></p>
+                    <button id="popupOkButton" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">Добре</button>
+                </div>
+            </div>
+
+            <div id="newGameControls" class="w-full flex justify-center gap-4 mt-4">
+                <button id="newGameButton" class="bg-indigo-600 text-white font-bold py-3 px-6 rounded-full shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-300 transform transition-transform duration-100 active:scale-95">
+                    <span id="newGameButtonText">Нова гра</span>
+                </button>
+                <select id="difficultySelector" class="px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-800 focus:border-blue-500 focus:ring focus:ring-blue-200 cursor-pointer"></select>
+            </div>
+            <p id="difficultyLockedMessage" class="text-red-500 text-center mt-2 hidden"></p>
+        </div>
+    </div>
+
+    <script>
+        // --- Localization Variables ---
+        let translations = {}; // Stores loaded translations
+        const supportedLanguages = {
+            'en': 'English',
+            'ru': 'Русский',
+            'es': 'Español',
+            'pt': 'Português',
+            'de': 'Deutsch',
+            'fr': 'Français',
+            'it': 'Italiano',
+            'ar': 'العربية',
+            'uk': 'Українська',
+            'id': 'Bahasa Indonesia'
+        };
+        let currentLanguage = localStorage.getItem('language') || (Telegram.WebApp.initDataUnsafe.user && Telegram.WebApp.initDataUnsafe.user.language_code) || 'en'; // Default language
+
+        // --- Game Configuration ---
+        const CODE_LENGTH = 4; // This will be overridden by Difficulty settings
+        const MAX_ATTEMPTS = 10; // This will be overridden by Difficulty settings
+        const HINT_COST_BASE = 50; // Base cost for hints
+        const MAX_HINTS_PER_GAME = 2; // Max hints user can buy per game
+
+        const Difficulty = {
+            NORMAL: {
+                displayName: 'Звичайний', // Will be translated
+                codeLength: 4,
+                maxAttempts: 10,
+                hintCost: HINT_COST_BASE,
+                rewardRange: { min: 100, max: 200 },
+                unlockCost: 0 // No unlock cost for normal
+            },
+            HARD: {
+                displayName: 'Важкий', // Will be translated
+                codeLength: 5,
+                maxAttempts: 8,
+                hintCost: HINT_COST_BASE * 2, // 100
+                rewardRange: { min: 300, max: 500 },
+                unlockCost: 500 // Cost to unlock Hard mode
+            },
+            CRAZY: {
+                displayName: 'Божевільний', // Will be translated
+                codeLength: 6,
+                maxAttempts: 6,
+                hintCost: HINT_COST_BASE * 4, // 200
+                rewardRange: { min: 700, max: 1000 },
+                unlockCost: 2000 // Cost to unlock Crazy mode
+            }
+        };
+
+        const UNLOCK_COSTS = {
+            HARD: 500,
+            CRAZY: 2000
+        };
+
+        // --- Game State Variables ---
+        let secretCode = [];
+        let attemptsLeft = MAX_ATTEMPTS;
+        let gameActive = false;
+        let timerInterval;
+        let secondsPassed = 0;
+        let hintsUsed = 0; // Track hints used in current game
+        let revealedDigits = {}; // { index: digit }
+        let lockedDigits = {}; // { index: digit } - for correctly guessed digits
+
+        // --- Persistent Data Variables ---
+        let totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
+        let gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
+        let bestTime = parseInt(localStorage.getItem('bestTime')) || 0; // Stored in seconds
+        let currentDifficultyKey = localStorage.getItem('currentDifficulty') || 'NORMAL';
+        let unlockedDifficulties = JSON.parse(localStorage.getItem('unlockedDifficulties')) || {
+            NORMAL: true,
+            HARD: false,
+            CRAZY: false
+        };
+        let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? (localStorage.getItem('isSoundEnabled') === 'true') : true; // Default to TRUE if not set
+        let isDarkMode = localStorage.getItem('isDarkMode') === 'true'; // Default to false if not set
+
+        // --- DOM Elements ---
+        const appTitle = document.getElementById('appTitle');
+        const totalCoinsDisplay = document.getElementById('totalCoinsDisplay');
+        const gamesPlayedDisplay = document.getElementById('gamesPlayedDisplay');
+        const bestTimeDisplay = document.getElementById('bestTimeDisplay');
+        const rewardRangeDisplay = document.getElementById('rewardRangeDisplay');
+        const messageDisplay = document.getElementById('messageDisplay');
+        let codeInputs = document.querySelectorAll('.code-input-container input'); // Use let as it will be reassigned
+        const breakButton = document.getElementById('breakButton');
+        const attemptsDisplay = document.getElementById('attemptsDisplay');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const hintsTitle = document.getElementById('hintsTitle');
+        const hintsList = document.getElementById('hintsList');
+        const noHintsMessage = document.getElementById('noHintsMessage');
+        const buyHintButton = document.getElementById('buyHintButton');
+        const popup = document.getElementById('popup');
+        const popupMessage = document.getElementById('popupMessage');
+        const popupOkButton = document.getElementById('popupOkButton');
+        const newGameButton = document.getElementById('newGameButton');
+        const newGameButtonText = document.getElementById('newGameButtonText');
+        const difficultySelector = document.getElementById('difficultySelector');
+        const difficultyLockedMessage = document.getElementById('difficultyLockedMessage');
+        const languageSelector = document.getElementById('languageSelector'); // Your existing language selector
+
+        // New UI Elements
+        const themeLightBtn = document.getElementById('themeLightBtn');
+        const themeDarkBtn = document.getElementById('themeDarkBtn');
+        const soundToggleBtn = document.getElementById('soundToggleBtn');
+        const soundOnIcon = document.getElementById('soundOnIcon');
+        const soundOffIcon = document.getElementById('soundOffIcon');
+
+
+        // --- Functions ---
+
+        // Localization
+        async function loadTranslations(lang) {
+            try {
+                const response = await fetch(`./locales/${lang}.json`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load translation for ${lang}: ${response.statusText}`);
+                }
+                translations = await response.json();
+                console.log(`[Localization] Loaded translations for ${lang}.`);
+                applyTranslations();
+            } catch (error) {
+                console.error(`[Localization Error] ${error.message}`);
+                // Fallback to English if translation fails
+                if (lang !== 'en') {
+                    console.warn('[Localization] Falling back to English.');
+                    currentLanguage = 'en';
+                    localStorage.setItem('language', 'en');
+                    await loadTranslations('en'); // Recursively call for English
+                }
+            }
+        }
+
+        function translate(key, ...args) {
+            let translation = translations[key] || key;
+            args.forEach((arg, index) => {
+                translation = translation.replace(`{${index}}`, arg);
+            });
+            // Replace named placeholders {placeholderName}
+            if (args.length > 0 && typeof args[0] === 'object' && args[0] !== null) {
+                for (const placeholder in args[0]) {
+                    translation = translation.replace(`{${placeholder}}`, args[0][placeholder]);
+                }
+            }
+            return translation;
+        }
+
+        function applyTranslations() {
+            appTitle.textContent = translate('app_title');
+            document.title = translate('app_title'); // Update document title
+            // Update difficulty display names
+            Difficulty.NORMAL.displayName = translate('difficulty_normal');
+            Difficulty.HARD.displayName = translate('difficulty_hard');
+            Difficulty.CRAZY.displayName = translate('difficulty_crazy');
+
+            // Apply translations to various DOM elements
+            messageDisplay.textContent = translate('game_start_message'); // Initial message
+            breakButton.textContent = translate('break_button');
+            hintsTitle.textContent = translate('hints_title');
+            noHintsMessage.textContent = translate('no_hints_available');
+            newGameButtonText.textContent = translate('new_game_button');
+
+            // Update coin display (will be updated by updateStatsDisplay)
+            updateStatsDisplay();
+
+            // Re-populate difficulty selector to update translated names
+            populateDifficultySelector();
+
+            // Update buy hint button text (cost will be updated by updateBuyHintButton)
+            updateBuyHintButton();
+        }
+
+        function updateStatsDisplay() {
+            totalCoinsDisplay.textContent = `${translate('total_coins')} ${totalCoins} SCG`;
+            gamesPlayedDisplay.textContent = `${translate('games_played')} ${gamesPlayed}`;
+            updateBestTimeDisplay();
+            updateRewardRangeDisplay(); // Ensure reward range is displayed
+        }
+
+        function updateBestTimeDisplay() {
+            if (bestTime > 0) {
+                bestTimeDisplay.textContent = `${translate('best')}: ${formatTime(bestTime)}`;
+            } else {
+                bestTimeDisplay.textContent = '';
+            }
+        }
+
+        function updateRewardRangeDisplay() {
+            const currentDiff = Difficulty[currentDifficultyKey];
+            if (currentDiff) {
+                rewardRangeDisplay.textContent = `${translate('reward_range')}: ${currentDiff.rewardRange.min}-${currentDiff.rewardRange.max} SCG`;
+            } else {
+                rewardRangeDisplay.textContent = '';
+            }
+        }
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function showPopup(messageKey, options = {}) {
+            popupMessage.innerHTML = translate(messageKey, options); // Use innerHTML for potential links/bolding if needed
+            popup.classList.remove('hidden');
+        }
+
+        function hidePopup() {
+            popup.classList.add('hidden');
+        }
+
+        // Game Logic
+        function generateSecretCode() {
+            const currentDiff = Difficulty[currentDifficultyKey];
+            const length = currentDiff.codeLength;
+            const code = [];
+            while (code.length < length) {
+                const digit = Math.floor(Math.random() * 10);
+                if (!code.includes(digit)) {
+                    code.push(digit);
+                }
+            }
+            return code;
+        }
+
+        function resetGame() {
+            console.log("[Game Reset] Resetting game state.");
+            const currentDiff = Difficulty[currentDifficultyKey];
+
+            if (!unlockedDifficulties[currentDifficultyKey]) {
+                const unlockCost = currentDiff.unlockCost;
+                difficultyLockedMessage.textContent = translate('difficulty_locked', { difficultyName: translate(`difficulty_${currentDifficultyKey.toLowerCase()}`), cost: unlockCost });
+                difficultyLockedMessage.classList.remove('hidden');
+                messageDisplay.textContent = translate('game_start_message'); // Reset message
+                clearInputs();
+                stopTimer();
+                gameActive = false;
+                breakButton.disabled = true;
+                buyHintButton.disabled = true;
+                return;
+            } else {
+                difficultyLockedMessage.classList.add('hidden');
+                breakButton.disabled = false;
+                buyHintButton.disabled = false;
+            }
+
+            secretCode = generateSecretCode();
+            attemptsLeft = currentDiff.maxAttempts;
+            secondsPassed = 0;
+            hintsUsed = 0;
+            revealedDigits = {};
+            lockedDigits = {};
+            gameActive = true;
+            clearInputs();
+            updateAttemptsDisplay();
+            updateTimerDisplay();
+            startTimer();
+            messageDisplay.textContent = translate('guess_code_message', { codeLength: currentDiff.codeLength });
+            hintsList.innerHTML = `<p id="noHintsMessage">${translate('no_hints_available')}</p>`;
+            buyHintButton.classList.remove('hidden'); // Ensure hint button is visible
+            updateBuyHintButton(); // Update cost display
+
+            // Recreate input fields based on current difficulty's codeLength
+            const inputContainer = document.querySelector('.code-input-container');
+            inputContainer.innerHTML = '';
+            for (let i = 0; i < currentDiff.codeLength; i++) {
+                const input = document.createElement('input');
+                input.type = 'number';
+                input.classList.add('w-12', 'h-12', 'text-center', 'text-2xl', 'font-bold', 'bg-gray-200', 'rounded-lg', 'border-2', 'border-gray-300', 'focus:border-blue-500', 'focus:ring', 'focus:ring-blue-200');
+                input.setAttribute('maxlength', '1');
+                input.setAttribute('pattern', '[0-9]');
+                input.setAttribute('inputmode', 'numeric');
+                input.addEventListener('input', handleInput);
+                input.addEventListener('keydown', handleKeyDown);
+                inputContainer.appendChild(input);
+            }
+            codeInputs = document.querySelectorAll('.code-input-container input'); // Update the NodeList
+            codeInputs[0].focus(); // Focus on the first input
+        }
+
+        function checkGuess() {
+            if (!gameActive) return;
+
+            const currentDiff = Difficulty[currentDifficultyKey];
+            const guess = Array.from(codeInputs).map(input => input.value).join('');
+
+            if (guess.length !== currentDiff.codeLength || guess.includes('')) {
+                messageDisplay.textContent = translate('guess_code_message', { codeLength: currentDiff.codeLength }); // Remind user
+                return;
+            }
+
+            const guessArr = guess.split('').map(Number);
+
+            // Apply locked digits (if any)
+            for (const index in lockedDigits) {
+                if (guessArr[index] !== lockedDigits[index]) {
+                    // If a locked digit is changed, reset input and inform user
+                    messageDisplay.textContent = translate('digit_already_locked');
+                    clearInputs();
+                    return;
+                }
+            }
+
+            // Check for duplicate digits in guess
+            if (new Set(guessArr).size !== currentDiff.codeLength) {
+                messageDisplay.textContent = translate('guess_code_message', { codeLength: currentDiff.codeLength }); // Invalid guess format
+                return;
+            }
+
+            attemptsLeft--;
+            updateAttemptsDisplay();
+
+            if (guessArr.join('') === secretCode.join('')) {
+                // Win
+                gameActive = false;
+                stopTimer();
+                gamesPlayed++;
+                localStorage.setItem('gamesPlayed', gamesPlayed);
+
+                // Calculate reward
+                let earnedCoins = Math.floor(Math.random() * (currentDiff.rewardRange.max - currentDiff.rewardRange.min + 1)) + currentDiff.rewardRange.min;
+                // Apply time bonus/penalty (optional, example)
+                const timeFactor = Math.max(0.5, 1 - (secondsPassed / 180)); // Bonus for faster times, up to 180s
+                earnedCoins = Math.round(earnedCoins * timeFactor);
+
+                totalCoins += earnedCoins;
+                localStorage.setItem('totalCoins', totalCoins);
+                updateStatsDisplay();
+
+                // Update best time
+                if (bestTime === 0 || secondsPassed < bestTime) {
+                    bestTime = secondsPassed;
+                    localStorage.setItem('bestTime', bestTime);
+                    updateBestTimeDisplay();
+                }
+
+                showPopup('safe_cracked_win', { earnedCoins: earnedCoins });
+
+                // Check for unlocked levels
+                checkAndUnlockDifficulty();
+
+            } else if (attemptsLeft <= 0) {
+                // Lose
+                gameActive = false;
+                stopTimer();
+                gamesPlayed++;
+                localStorage.setItem('gamesPlayed', gamesPlayed);
+                showPopup('game_over_message', { secretCode: secretCode.join('') });
+            } else {
+                // Incorrect guess, provide hint based on match
+                const { correctPosition, correctDigit } = analyzeGuess(guessArr);
+                let hintMessage = '';
+
+                // These rules might need refinement based on exact game logic
+                if (correctPosition === currentDiff.codeLength && correctDigit === 0) { // All correct, all in place
+                    hintMessage = translate('hint_rule_perfect'); // This case shouldn't be reached as it's a win
+                } else if (correctPosition > 0 && correctDigit > 0) {
+                    hintMessage = translate('hint_rule_bulls_and_cows', { correctPosition: correctPosition, correctDigit: correctDigit });
+                } else if (correctPosition > 0) {
+                    hintMessage = translate('hint_rule_bulls', { correctPosition: correctPosition });
+                } else if (correctDigit > 0) {
+                    hintMessage = translate('hint_rule_cows', { correctDigit: correctDigit });
+                } else {
+                    hintMessage = translate('incorrect_guess_message', { attemptsLeft: attemptsLeft });
+                }
+
+
+                messageDisplay.textContent = hintMessage;
+                clearInputs();
+            }
+        }
+
+        function analyzeGuess(guessArr) {
+            let correctPosition = 0; // "Bulls"
+            let correctDigit = 0; // "Cows" - correct digit, wrong position
+
+            // Create a temporary copy of secretCode to mark used digits for 'correctDigit' calculation
+            const tempSecret = [...secretCode];
+            const tempGuess = [...guessArr];
+
+            // First, count correct position (bulls) and mark them as used
+            for (let i = 0; i < tempSecret.length; i++) {
+                if (tempGuess[i] === tempSecret[i]) {
+                    correctPosition++;
+                    tempSecret[i] = -1; // Mark as used
+                    tempGuess[i] = -1; // Mark as used
+                }
+            }
+
+            // Then, count correct digit but wrong position (cows)
+            for (let i = 0; i < tempGuess.length; i++) {
+                if (tempGuess[i] !== -1) { // If not already counted as correct position
+                    const secretIndex = tempSecret.indexOf(tempGuess[i]);
+                    if (secretIndex !== -1) { // If digit exists in secret code
+                        correctDigit++;
+                        tempSecret[secretIndex] = -1; // Mark as used
+                    }
+                }
+            }
+
+            return { correctPosition, correctDigit };
+        }
+
+        function clearInputs() {
+            codeInputs.forEach(input => {
+                input.value = '';
+                input.disabled = false; // Enable all inputs
+                input.classList.remove('bg-green-200', 'border-green-500'); // Remove correct styling
+            });
+            // Reapply locked digits state
+            for (const index in lockedDigits) {
+                codeInputs[index].value = lockedDigits[index];
+                codeInputs[index].disabled = true;
+                codeInputs[index].classList.add('bg-green-200', 'border-green-500');
+            }
+            // Focus on the first available input
+            const firstAvailableInput = Array.from(codeInputs).find(input => !input.disabled);
+            if (firstAvailableInput) {
+                firstAvailableInput.focus();
+            } else if (codeInputs.length > 0) {
+                codeInputs[0].focus(); // Fallback to first if all locked/disabled
+            }
+        }
+
+        function updateAttemptsDisplay() {
+            attemptsDisplay.textContent = translate('attempts_left_message', { attemptsLeft: attemptsLeft });
+        }
+
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                secondsPassed++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay() {
+            timerDisplay.textContent = `${translate('time')}: ${formatTime(secondsPassed)}`;
+        }
+
+        function buyHint() {
+            if (!gameActive) return;
+
+            const currentDiff = Difficulty[currentDifficultyKey];
+            const hintCost = currentDiff.hintCost;
+
+            if (hintsUsed >= MAX_HINTS_PER_GAME) {
+                showPopup('hint_max_limit_message');
+                return;
+            }
+
+            if (totalCoins < hintCost) {
+                showPopup('not_enough_coins_normal', { seconds: 10 }); // Or maybe suggest changing difficulty
+                return;
+            }
+
+            showPopup('hint_cost_message', { cost: hintCost });
+            popupOkButton.onclick = () => {
+                hidePopup();
+                totalCoins -= hintCost;
+                localStorage.setItem('totalCoins', totalCoins);
+                updateStatsDisplay();
+                hintsUsed++;
+
+                // Reveal a random unrevealed digit
+                const availableIndices = Array.from({ length: currentDiff.codeLength }, (_, i) => i)
+                                            .filter(index => revealedDigits[index] === undefined);
+
+                if (availableIndices.length === 0) {
+                    showPopup('puzzle_generation_failed'); // Should not happen if hintsUsed < MAX_HINTS
+                    return;
+                }
+
+                const randomIndex = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+                revealedDigits[randomIndex] = secretCode[randomIndex];
+                lockedDigits[randomIndex] = secretCode[randomIndex]; // Lock the revealed digit
+
+                // Update input field and disable it
+                const inputToReveal = codeInputs[randomIndex];
+                inputToReveal.value = secretCode[randomIndex];
+                inputToReveal.disabled = true;
+                inputToReveal.classList.add('bg-green-200', 'border-green-500'); // Highlight correct digit
+                inputToReveal.blur(); // Remove focus
+
+                // Add hint to list
+                const hintItem = document.createElement('p');
+                hintItem.classList.add('bg-blue-100', 'text-blue-800', 'px-3', 'py-1', 'rounded-full');
+                hintItem.textContent = translate('hint_revealed_digit', { position: randomIndex + 1, digit: secretCode[randomIndex] });
+                if (hintsList.querySelector('#noHintsMessage')) {
+                    hintsList.innerHTML = ''; // Clear "no hints" message
+                }
+                hintsList.appendChild(hintItem);
+                
+                showPopup('hint_bought_success', { coinsLeft: totalCoins });
+            };
+        }
+
+        function updateBuyHintButton() {
+            const currentDiff = Difficulty[currentDifficultyKey];
+            const hintCost = currentDiff.hintCost;
+            buyHintButton.textContent = `${translate('buy_hint_button')} (${hintCost} SCG)`;
+            if (hintsUsed >= MAX_HINTS_PER_GAME) {
+                buyHintButton.disabled = true;
+                buyHintButton.textContent = translate('hint_max_limit_message');
+            } else {
+                buyHintButton.disabled = false;
+            }
+        }
+
+        function checkAndUnlockDifficulty() {
+            const newLevelsUnlocked = [];
+
+            if (!unlockedDifficulties.HARD && totalCoins >= UNLOCK_COSTS.HARD) {
+                unlockedDifficulties.HARD = true;
+                newLevelsUnlocked.push(translate('difficulty_hard'));
+            }
+            if (!unlockedDifficulties.CRAZY && totalCoins >= UNLOCK_COSTS.CRAZY) {
+                unlockedDifficulties.CRAZY = true;
+                newLevelsUnlocked.push(translate('difficulty_crazy'));
+            }
+
+            if (newLevelsUnlocked.length > 0) {
+                localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
+                const unlockedMessage = newLevelsUnlocked.map(level => `"${level}"`).join(', ');
+                showPopup('new_level_unlocked', { levelName: unlockedMessage });
+                populateDifficultySelector(); // Update selector with newly unlocked levels
+            }
+        }
+
+        // Event Handlers
+        function handleInput(event) {
+            let input = event.target;
+            // Ensure only one digit is entered
+            if (input.value.length > 1) {
+                input.value = input.value.slice(0, 1);
+            }
+            // Move focus to next input if current is filled
+            if (input.value !== '' && input.nextElementSibling) {
+                input.nextElementSibling.focus();
+            }
+        }
+
+        function handleKeyDown(event) {
+            let input = event.target;
+            // Move focus to previous input on backspace if current is empty
+            if (event.key === 'Backspace' && input.value === '' && input.previousElementSibling) {
+                input.previousElementSibling.focus();
+            }
+        }
+
+        function saveGameData() {
+            localStorage.setItem('totalCoins', totalCoins);
+            localStorage.setItem('gamesPlayed', gamesPlayed);
+            localStorage.setItem('bestTime', bestTime);
+            localStorage.setItem('currentDifficulty', currentDifficultyKey);
+            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
+            localStorage.setItem('isSoundEnabled', isSoundEnabled); // Save sound preference
+            localStorage.setItem('isDarkMode', isDarkMode); // Save dark mode preference
+            console.log("[Game Data] Saved all game data.");
+        }
+
+        function loadGameData() {
+            totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
+            gamesPlayed = parseInt(localStorage.getItem('gamesPlayed')) || 0;
+            bestTime = parseInt(localStorage.getItem('bestTime')) || 0;
+            currentDifficultyKey = localStorage.getItem('currentDifficulty') || 'NORMAL';
+            unlockedDifficulties = JSON.parse(localStorage.getItem('unlockedDifficulties')) || {
+                NORMAL: true,
+                HARD: false,
+                CRAZY: false
+            };
+            isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? (localStorage.getItem('isSoundEnabled') === 'true') : true; // Default to TRUE if not set
+            isDarkMode = localStorage.getItem('isDarkMode') === 'true'; // Default to false if not set
+            console.log("[Game Data] Loaded all game data.");
+        }
+
+        function populateLanguageSelector() {
+            languageSelector.innerHTML = ''; // Clear previous options
+            for (const langCode in supportedLanguages) {
+                const option = document.createElement('option');
+                option.value = langCode;
+                option.textContent = supportedLanguages[langCode];
+                languageSelector.appendChild(option);
+            }
+            languageSelector.value = currentLanguage;
+            console.log("[Language Selector] Selector value set to:", currentLanguage);
+        }
+
+        function populateDifficultySelector() {
+            difficultySelector.innerHTML = ''; // Clear existing options
+            for (const key in Difficulty) {
+                if (Object.prototype.hasOwnProperty.call(Difficulty, key) &&
+                    typeof Difficulty[key] === 'object' &&
+                    Difficulty[key] !== null &&
+                    Difficulty[key].displayName) {
+
+                    // Only add if unlocked or it's the current selected one
+                    if (unlockedDifficulties[key] || key === currentDifficultyKey) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = translate(`difficulty_${key.toLowerCase()}`); // Use translated name
+                        difficultySelector.appendChild(option);
+                    }
+                } else {
+                    console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
+                }
+            }
+            // Set the selector value based on currentDifficultyKey, ensure it's a valid option
+            if (!unlockedDifficulties[currentDifficultyKey]) {
+                currentDifficultyKey = 'NORMAL'; // Fallback if selected is locked
+                localStorage.setItem('currentDifficulty', 'NORMAL');
+            }
+            difficultySelector.value = currentDifficultyKey;
+            console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
+        }
+
+        // --- Theme and Sound Toggle Logic ---
+        function applyTheme() {
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.game-container').classList.add('dark-mode');
+            } else {
+                document.body.classList.remove('dark-mode');
+                document.querySelector('.game-container').classList.remove('dark-mode');
+            }
+            localStorage.setItem('isDarkMode', isDarkMode);
+        }
+
+        function toggleTheme(setToDark) { // Added parameter to allow direct setting
+            if (typeof setToDark === 'boolean') {
+                isDarkMode = setToDark;
+            } else {
+                isDarkMode = !isDarkMode; // Toggle if no parameter
+            }
+            applyTheme();
+        }
+
+        function updateSoundIcon() {
+            if (isSoundEnabled) {
+                soundOnIcon.classList.remove('hidden');
+                soundOffIcon.classList.add('hidden');
+            } else {
+                soundOnIcon.classList.add('hidden');
+                soundOffIcon.classList.remove('hidden');
+            }
+            localStorage.setItem('isSoundEnabled', isSoundEnabled);
+        }
+
+        function toggleSound() {
+            isSoundEnabled = !isSoundEnabled;
+            updateSoundIcon();
+            // Here you would add logic to actually play/stop game sounds
+            // Example: if (isSoundEnabled) { playBackgroundMusic(); } else { stopBackgroundMusic(); }
+            console.log(`Sound is now: ${isSoundEnabled ? 'On' : 'Off'}`);
+        }
+
+
+        // --- Event Listeners ---
+        breakButton.addEventListener('click', checkGuess);
+        newGameButton.addEventListener('click', () => {
+            resetGame();
+            hidePopup();
+        });
+        popupOkButton.addEventListener('click', hidePopup);
+        buyHintButton.addEventListener('click', buyHint);
+
+        // Input field event listeners (re-attached after inputs are recreated by resetGame)
+        // Initial attachment for existing inputs (important for the first load)
+        codeInputs.forEach(input => {
+            input.addEventListener('input', handleInput);
+            input.addEventListener('keydown', handleKeyDown);
+        });
+
+        difficultySelector.addEventListener('change', (event) => {
+            currentDifficultyKey = event.target.value;
+            localStorage.setItem('currentDifficulty', currentDifficultyKey);
+            resetGame(); // Reset game to apply new difficulty
+            saveGameData(); // Save selected difficulty
+        });
+
+        languageSelector.addEventListener('change', async (event) => {
+            currentLanguage = event.target.value;
+            localStorage.setItem('language', currentLanguage);
+            await loadTranslations(currentLanguage); // Reload translations
+            resetGame(); // Reset game to apply new language messages to game state
+            saveGameData(); // Save new language
+        });
+
+        // New Event Listeners for Theme and Sound
+        themeLightBtn.addEventListener('click', () => toggleTheme(false)); // Set to light
+        themeDarkBtn.addEventListener('click', () => toggleTheme(true)); // Set to dark
+        soundToggleBtn.addEventListener('click', toggleSound);
+
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log("[DOM Loaded] DOM content fully loaded.");
+            loadGameData(); // Load all stats, language, theme, sound preference
+
+            // Apply theme and sound icon immediately based on loaded data
+            applyTheme();
+            updateSoundIcon();
+
+            await loadTranslations(currentLanguage); // Load translations first
+
+            populateLanguageSelector(); // Populate language selector based on supported languages
+            populateDifficultySelector(); // Populate difficulty selector with translated names
+
+            // Check and update unlocked difficulties based on totalCoins
+            // This is important to ensure levels are unlocked even if user didn't explicitly play on them
+            if (totalCoins >= UNLOCK_COSTS.HARD) {
+                unlockedDifficulties.HARD = true;
+            }
+            if (totalCoins >= UNLOCK_COSTS.CRAZY) {
+                unlockedDifficulties.CRAZY = true;
+            }
+            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties)); // Save any new unlocks from load
+
+            console.log("[DOM Loaded] Starting a new game.");
+            resetGame(); // This will now correctly handle locked levels by not starting a game.
+            Telegram.WebApp.ready(); // Notify Telegram WebApp is ready
+        });
+    </script>
+</body>
+</html>
