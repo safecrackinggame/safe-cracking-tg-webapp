@@ -27,7 +27,7 @@
   "safe_cracked_win": "Сейф открыт! Вы заработали {earnedCoins} SCG!",
   "your_time": "Ваше время:",
   "best_time": "Лучшее время:",
-  "game_over_message": "Тревога! Охрана предупреждена. Уровень перезапускается... /nКод был: {secretCode}.",
+  "game_over_message": "Тревога! Охрана предупреждена. Уровень перезапускается... \nКод был: {secretCode}.",
   "incorrect_guess_message": "Неверно! Осталось попыток: {attemptsLeft}.",
   "game_start_message": "Выберите действие.",
   "new_level_unlocked": "Новый уровень разблокирован!",
