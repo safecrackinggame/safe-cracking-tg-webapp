@@ -314,6 +314,15 @@
             flex-wrap: wrap;
             gap: 0.5rem;
         }
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
         .settings-bar {
             display: flex;
             align-items: center;
@@ -370,6 +379,11 @@
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
                     </svg>
                 </button>
+            </div>
+            <div class="settings-bar">
+                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+            </div>
+            <div class="settings-bar">
                 <button id="sound-toggle-btn" class="sound-toggle-btn">
                     <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
@@ -381,10 +395,11 @@
                         <path d="M3,9v6h4l5,5V4L7,9H3z"/>
                     </svg>
                 </button>
-                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
+        </div>
+        <div class="bottom-bar">
             <div class="settings-bar">
-                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
             <div class="settings-bar">
                 <select id="language-selector" class="p-2 border rounded-lg shadow-sm"></select>
@@ -1563,15 +1578,7 @@
                     Difficulty[key].displayNameKey) {
                     const option = document.createElement('option');
                     option.value = key;
-                    
-                    let optionText = translate(Difficulty[key].displayNameKey);
-
-                    if (key !== 'NORMAL') {
-                        const multiplier = Difficulty[key].recoveryAmount / Difficulty.NORMAL.recoveryAmount;
-                        optionText += ` x${multiplier} SCG`; // Исправлено: += для уникального добавления множителя
-                    }
-                    
-                    option.textContent = optionText.trim(); // Удаляем лишние пробелы
+                    option.textContent = translate(Difficulty[key].displayNameKey);
                     difficultySelector.appendChild(option);
                 } else {
                     console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
