@@ -360,8 +360,8 @@
             color: #f59e0b;
         }
         .logo-placeholder {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             visibility: hidden;
         }
         .full-width-image {
@@ -369,15 +369,13 @@
             max-width: 420px;
             margin-bottom: 1rem;
         }
-        .logo-container {
+        .logo-image {
     position: fixed;
     top: 10px;
     left: 10px;
-    z-index: 3000;
-}
-        .logo-image {
-            width: 32px;
-            height: 32px;
+    width: 32px;
+    height: 32px;
+    z-index: 5000; /* Максимально высокий z-index */
         }
         .image-overlay {
             position: fixed;
@@ -398,40 +396,24 @@
     </style>
 </head>
 <body>
-    <div id="logo-container" class="logo-container">
     <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image">
-</div>
 <div class="game-container">
-        <div class="top-bar">
-    <div class="settings-bar">
-        <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
+    <div class="top-bar">
+        <div class="settings-bar">
+            <div class="logo-placeholder"></div>
+        </div>
+        <div class="settings-bar">
+            <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+        </div>
+        <div class="settings-bar">
+            <button id="theme-toggle-btn" class="theme-toggle-btn">
+                <!-- SVG кнопки темы -->
+            </button>
+            <button id="sound-toggle-btn" class="sound-toggle-btn">
+                <!-- SVG кнопки звука -->
+            </button>
+        </div>
     </div>
-    <div class="settings-bar">
-        <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
-    </div>
-    <div class="settings-bar">
-        <button id="theme-toggle-btn" class="theme-toggle-btn">
-            <svg id="theme-sun-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="5" fill="currentColor"/>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <svg id="theme-moon-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
-            </svg>
-        </button>
-        <button id="sound-toggle-btn" class="sound-toggle-btn">
-            <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
-                <path d="M13,6c2,2 2.5,4 2.5,6c0,2 -0.5,4 -2.5,6"/>
-                <path d="M15,5c2.5,2.5 3,5 3,7c0,2 -0.5,4.5 -3,7"/>
-                <path d="M17,3c3,3 3.5,6 3.5,9c0,3 -0.5,6 -3.5,9"/>
-            </svg>
-            <svg id="sound-off-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3,9v6h4l5,5V4L7,9H3z"/>
-            </svg>
-        </button>
-    </div>
-</div>
         <div class="bottom-bar">
             <div class="settings-bar">
                 <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
@@ -1658,7 +1640,6 @@
             rewardRangeDisplay.textContent = '';
         }
 
-           <script>
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
             loadGameData();
@@ -1679,17 +1660,6 @@
             setTimeout(() => {
                 resetGame();
             }, 5000);
-
-            // Добавляем код для логотипа
-            const overlay = document.querySelector('.image-overlay');
-            const logoContainer = document.getElementById('logo-container');
-
-            if (overlay && logoContainer) {
-                overlay.appendChild(logoContainer); // Перемещаем логотип внутрь оверлея
-                logoContainer.style.position = 'absolute'; // Делаем его абсолютным внутри оверлея
-                logoContainer.style.top = '10px';
-                logoContainer.style.left = '10px';
-            }
         });
     </script>
 </body>
