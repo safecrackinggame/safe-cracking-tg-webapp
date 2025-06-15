@@ -369,6 +369,12 @@
             max-width: 420px;
             margin-bottom: 1rem;
         }
+        .logo-container {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 3000;
+}
         .logo-image {
             width: 32px;
             height: 32px;
@@ -392,7 +398,10 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
+    <div id="logo-container" class="logo-container">
+    <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image">
+</div>
+<div class="game-container">
         <div class="top-bar">
     <div class="settings-bar">
         <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
@@ -1649,6 +1658,7 @@
             rewardRangeDisplay.textContent = '';
         }
 
+           <script>
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
             loadGameData();
@@ -1669,6 +1679,17 @@
             setTimeout(() => {
                 resetGame();
             }, 5000);
+
+            // Добавляем код для логотипа
+            const overlay = document.querySelector('.image-overlay');
+            const logoContainer = document.getElementById('logo-container');
+
+            if (overlay && logoContainer) {
+                overlay.appendChild(logoContainer); // Перемещаем логотип внутрь оверлея
+                logoContainer.style.position = 'absolute'; // Делаем его абсолютным внутри оверлея
+                logoContainer.style.top = '10px';
+                logoContainer.style.left = '10px';
+            }
         });
     </script>
 </body>
