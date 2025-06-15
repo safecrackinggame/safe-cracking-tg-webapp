@@ -1569,19 +1569,12 @@
         }
 
         function showImage(src, duration) {
-    const gameImage = document.getElementById('game-image');
-    gameImage.src = src;
-    const imageOverlay = document.getElementById('image-overlay');
-    imageOverlay.classList.remove('hidden');
-    setTimeout(() => {
-        imageOverlay.classList.add('hidden');
-        // Восстанавливаем логотип, если он исчез
-        const logoImage = document.getElementById('logo-image');
-        if (logoImage && logoImage.style.display === 'none') {
-            logoImage.style.display = ''; // Сбрасываем display на значение по умолчанию
+            gameImage.src = src;
+            imageOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                imageOverlay.classList.add('hidden');
+            }, duration);
         }
-    }, duration);
-}
 
         guessButton.addEventListener('click', checkGuess);
         newGameButton.addEventListener('click', resetGame);
