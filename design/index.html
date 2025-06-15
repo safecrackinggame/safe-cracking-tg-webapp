@@ -370,8 +370,8 @@
             margin-bottom: 1rem;
         }
         .logo-image {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
         }
         .image-overlay {
             position: fixed;
@@ -395,7 +395,7 @@
     <div class="game-container">
         <div class="top-bar">
     <div class="settings-bar">
-        <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
+        <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/safe_cracking.webp" alt="Logo" class="logo-image">
     </div>
     <div class="settings-bar">
         <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
@@ -1665,7 +1665,7 @@
             }
 
             console.log("[DOM Loaded] Starting a new game.");
-            show('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
             }, 5000);
