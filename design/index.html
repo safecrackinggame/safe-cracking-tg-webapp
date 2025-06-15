@@ -370,8 +370,8 @@
             margin-bottom: 1rem;
         }
         .logo-image {
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
         }
         .image-overlay {
             position: fixed;
@@ -395,6 +395,12 @@
     <div class="game-container">
         <div class="top-bar">
             <div class="settings-bar">
+                <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/safe_cracking.webp" alt="Logo" class="logo-image">
+            </div>
+            <div class="settings-bar">
+                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+            </div>
+            <div class="settings-bar">
                 <button id="theme-toggle-btn" class="theme-toggle-btn">
                     <svg id="theme-sun-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="5" fill="currentColor"/>
@@ -403,13 +409,7 @@
                     <svg id="theme-moon-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
                     </svg>
-                    <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
                 </button>
-            </div>
-            <div class="settings-bar">
-                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
-            </div>
-            <div class="settings-bar">
                 <button id="sound-toggle-btn" class="sound-toggle-btn">
                     <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                         <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
@@ -518,9 +518,6 @@
         const themeMoonIcon = document.getElementById('theme-moon-icon');
         const soundOnIcon = document.getElementById('sound-on-icon');
         const soundOffIcon = document.getElementById('sound-off-icon');
-        const logoImage = document.getElementById('logo-image');
-        const imageOverlay = document.getElementById('image-overlay');
-        const gameImage = document.getElementById('game-image');
 
         // --- Game State Variables ---
         let totalCoins = 0;
@@ -611,7 +608,7 @@
                 numberOfHints: 3,
                 attempts: 5,
                 rewardRange: { min: 20, max: 100 },
-                hintCostRange: { min: 90, max: 450 },
+                hintCostRange: { min: 9, max: 45 },
                 recoveryTime: 5,
                 recoveryAmount: 100,
                 hintRules: [
@@ -626,7 +623,7 @@
                 numberOfHints: 3,
                 attempts: 5,
                 rewardRange: { min: 100, max: 500 },
-                hintCostRange: { min: 450, max: 2250 },
+                hintCostRange: { min: 45, max: 225 },
                 recoveryTime: 10,
                 recoveryAmount: 500,
                 hintRules: [
@@ -641,7 +638,7 @@
                 numberOfHints: 4,
                 attempts: 5,
                 rewardRange: { min: 500, max: 2500 },
-                hintCostRange: { min: 2250, max: 11250 },
+                hintCostRange: { min: 225, max: 1125 },
                 recoveryTime: 15,
                 recoveryAmount: 2500,
                 hintRules: [
@@ -1245,7 +1242,7 @@
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 3000);
+                showImage(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 3000);
                 Telegram.WebApp.showPopup({
                     title: translate('victory_title'),
                     message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
@@ -1264,7 +1261,7 @@
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/alarm.webp', 3000);
+                showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/alarm.webp', 3000);
                 Telegram.WebApp.showPopup({
                     title: translate('defeat_title'),
                     message: translate('game_over_message', {secretCode: gameLogic.getSecretCode()}),
@@ -1532,7 +1529,6 @@
 
             updateTheme();
             updateSoundIcon();
-            logoImage.classList.toggle('hidden', !isGameInProgress);
         }
 
         function displayHints(hints, rules) {
@@ -1665,7 +1661,7 @@
             }
 
             console.log("[DOM Loaded] Starting a new game.");
-            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
             }, 5000);
