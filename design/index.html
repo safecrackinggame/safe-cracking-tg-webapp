@@ -1568,11 +1568,11 @@
             clearInterval(timerInterval);
         }
 
-        function show(src, duration) {
-            game.src = src;
-            Overlay.classList.remove('hidden');
+        function showImage(src, duration) {
+            gameImage.src = src;
+            imageOverlay.classList.remove('hidden');
             setTimeout(() => {
-                Overlay.classList.add('hidden');
+                imageOverlay.classList.add('hidden');
             }, duration);
         }
 
