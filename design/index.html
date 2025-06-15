@@ -372,8 +372,6 @@
         .logo-image {
             width: 32px;
             height: 32px;
-            position: relative;
-            z-index: 2001; /* Выше оверлея (z-index: 2000) */
         }
         .image-overlay {
             position: fixed;
@@ -1571,12 +1569,15 @@
         }
 
         function showImage(src, duration) {
-            gameImage.src = src;
-            imageOverlay.classList.remove('hidden');
-            setTimeout(() => {
-                imageOverlay.classList.add('hidden');
-            }, duration);
-        }
+    const gameImage = document.getElementById('game-image');
+    gameImage.src = src;
+    const imageOverlay = document.getElementById('image-overlay');
+    imageOverlay.style.zIndex = 2000; // Убедимся, что оверлей ниже логотипа
+    imageOverlay.classList.remove('hidden');
+    setTimeout(() => {
+        imageOverlay.classList.add('hidden');
+    }, duration);
+}
 
         guessButton.addEventListener('click', checkGuess);
         newGameButton.addEventListener('click', resetGame);
