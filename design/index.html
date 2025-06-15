@@ -403,7 +403,7 @@
                     <svg id="theme-moon-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
                     </svg>
-                    <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/tree/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
+                    <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
                 </button>
             </div>
             <div class="settings-bar">
@@ -1245,7 +1245,7 @@
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/tree/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 3000);
+                showImage(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 3000);
                 Telegram.WebApp.showPopup({
                     title: translate('victory_title'),
                     message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
@@ -1264,7 +1264,7 @@
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/tree/main/design/assets/alarm.webp', 3000);
+                showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/alarm.webp', 3000);
                 Telegram.WebApp.showPopup({
                     title: translate('defeat_title'),
                     message: translate('game_over_message', {secretCode: gameLogic.getSecretCode()}),
@@ -1665,7 +1665,7 @@
             }
 
             console.log("[DOM Loaded] Starting a new game.");
-            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/tree/main/design/assets/start.webp', 5000);
+            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
             }, 5000);
