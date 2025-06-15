@@ -232,7 +232,7 @@
             color: #333;
             font-size: 1rem;
             appearance: none;
-            background-: url("data:/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3e%3c/path%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3e%3c/path%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 0.75rem center;
             background-size: 1.25rem;
@@ -385,6 +385,9 @@
             align-items: center;
             z-index: 5000;
         }
+        .dark-mode .image-overlay {
+            background-color: #2d3748;
+        }
         .image-overlay img {
             max-width: 100%;
             max-height: 100%;
@@ -394,35 +397,35 @@
 <body>
     <div class="game-container">
         <div class="top-bar">
-    <div class="settings-bar">
-        <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
-    </div>
-    <div class="settings-bar">
-        <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
-    </div>
-    <div class="settings-bar">
-        <button id="theme-toggle-btn" class="theme-toggle-btn">
-            <svg id="theme-sun-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="5" fill="currentColor"/>
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <svg id="theme-moon-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
-            </svg>
-        </button>
-        <button id="sound-toggle-btn" class="sound-toggle-btn">
-            <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
-                <path d="M13,6c2,2 2.5,4 2.5,6c0,2 -0.5,4 -2.5,6"/>
-                <path d="M15,5c2.5,2.5 3,5 3,7c0,2 -0.5,4.5 -3,7"/>
-                <path d="M17,3c3,3 3.5,6 3.5,9c0,3 -0.5,6 -3.5,9"/>
-            </svg>
-            <svg id="sound-off-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3,9v6h4l5,5V4L7,9H3z"/>
-            </svg>
-        </button>
-    </div>
-</div>
+            <div class="settings-bar">
+                <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image hidden">
+            </div>
+            <div class="settings-bar">
+                <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+            </div>
+            <div class="settings-bar">
+                <button id="theme-toggle-btn" class="theme-toggle-btn">
+                    <svg id="theme-sun-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="5" fill="currentColor"/>
+                        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    <svg id="theme-moon-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="currentColor"/>
+                    </svg>
+                </button>
+                <button id="sound-toggle-btn" class="sound-toggle-btn">
+                    <svg id="sound-on-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3,9v6h4l5,5V4l-5,5H3z"/>
+                        <path d="M13,6c2,2 2.5,4 2.5,6c0,2 -0.5,4 -2.5,6"/>
+                        <path d="M15,5c2.5,2.5 3,5 3,7c0,2 -0.5,4.5 -3,7"/>
+                        <path d="M17,3c3,3 3.5,6 3.5,9c0,3 -0.5,6 -3.5,9"/>
+                    </svg>
+                    <svg id="sound-off-icon" class="w-6 h-6 hidden" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3,9v6h4l5,5V4L7,9H3z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
         <div class="bottom-bar">
             <div class="settings-bar">
                 <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
@@ -522,6 +525,16 @@
         const imageOverlay = document.getElementById('image-overlay');
         const gameImage = document.getElementById('game-image');
 
+        // --- Audio Elements ---
+        const audioOpen = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/open.mp3');
+        const audioError = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/error.mp3');
+        const audioClick = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/click_sound.mp3');
+        const audioAlarm = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/alarm.mp3');
+        const audioAlarm2 = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/alarm2.mp3');
+        const audioOpenCrazy = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/opencrazy.mp3');
+        const audioOpenHard = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/openhard.mp3');
+        const audioOpenNormal = new Audio('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/sounds/opennormal.mp3');
+
         // --- Game State Variables ---
         let totalCoins = 0;
         const INITIAL_COINS = 100;
@@ -594,6 +607,13 @@
         function updateSoundIcon() {
             soundOnIcon.classList.toggle('hidden', !isSoundEnabled);
             soundOffIcon.classList.toggle('hidden', isSoundEnabled);
+        }
+
+        function playSound(audio) {
+            if (isSoundEnabled) {
+                audio.currentTime = 0;
+                audio.play().catch(error => console.warn('[Audio] Play failed:', error));
+            }
         }
 
         // --- Hint Rules and Difficulty ---
@@ -1241,17 +1261,20 @@
                 updateUI();
                 saveGameData();
 
+                playSound(currentDifficultyKey === 'NORMAL' ? audioOpenNormal : currentDifficultyKey === 'HARD' ? audioOpenHard : audioOpenCrazy);
                 showMessage(translate('safe_cracked_win', {earnedCoins: earnedCoins}), 'green');
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 3000);
-                Telegram.WebApp.showPopup({
-                    title: translate('victory_title'),
-                    message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
-                    buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
-                });
-                Telegram.WebApp.setHeaderColor('accent_text_color');
+                showImageWithDelay(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 2000);
+                setTimeout(() => {
+                    Telegram.WebApp.showPopup({
+                        title: translate('victory_title'),
+                        message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
+                        buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
+                    });
+                    Telegram.WebApp.setHeaderColor('accent_text_color');
+                }, 2000);
             } else if (guessResult.isGameOver) {
                 stopTimer();
                 isGameInProgress = false;
@@ -1260,18 +1283,23 @@
                 updateUI();
                 saveGameData();
 
+                playSound(audioAlarm);
                 showMessage(translate('game_over_message', {secretCode: gameLogic.getSecretCode()}), 'red');
                 solutionDisplay.textContent = '';
                 guessButton.disabled = true;
                 newGameButton.classList.remove('hidden');
-                showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/alarm.webp', 3000);
-                Telegram.WebApp.showPopup({
-                    title: translate('defeat_title'),
-                    message: translate('game_over_message', {secretCode: gameLogic.getSecretCode()}),
-                    buttons: [{ id: 'ok', type: 'ok', text: translate('understood_button') }]
-                });
-                Telegram.WebApp.setHeaderColor('destructive_text_color');
+                showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/alarm.webp', 2000);
+                setTimeout(() => {
+                    playSound(audioAlarm2);
+                    Telegram.WebApp.showPopup({
+                        title: translate('defeat_title'),
+                        message: translate('game_over_message', {secretCode: gameLogic.getSecretCode()}),
+                        buttons: [{ id: 'ok', type: 'ok', text: translate('understood_button') }]
+                    });
+                    Telegram.WebApp.setHeaderColor('destructive_text_color');
+                }, 2000);
             } else {
+                playSound(audioError);
                 showMessage(translate('incorrect_guess_message', {attemptsLeft: guessResult.attemptsLeft}), 'orange');
                 if (currentDifficultyKey === 'NORMAL') {
                     guessResult.correctlyPlacedDigits.forEach(index => {
@@ -1416,6 +1444,7 @@
                 upButton.onclick = (e) => {
                     const idx = parseInt(e.target.dataset.index);
                     if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+                        playSound(audioClick);
                         let currentVal = parseInt(gameLogic.currentGuess[idx]);
                         gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
                         updateGuessInputsDisplay();
@@ -1428,6 +1457,7 @@
                 digitDisplay.onclick = (e) => {
                     const idx = parseInt(e.target.dataset.index);
                     if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+                        playSound(audioClick);
                         let currentVal = parseInt(gameLogic.currentGuess[idx]);
                         gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
                         updateGuessInputsDisplay();
@@ -1440,6 +1470,7 @@
                 downButton.onclick = (e) => {
                     const idx = parseInt(e.target.dataset.index);
                     if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+                        playSound(audioClick);
                         let currentVal = parseInt(gameLogic.currentGuess[idx]);
                         gameLogic.currentGuess[idx] = ((currentVal - 1 + 10) % 10).toString();
                         updateGuessInputsDisplay();
@@ -1568,6 +1599,14 @@
             clearInterval(timerInterval);
         }
 
+        function showImageWithDelay(src, duration) {
+            gameImage.src = src;
+            imageOverlay.classList.remove('hidden');
+            setTimeout(() => {
+                imageOverlay.classList.add('hidden');
+            }, duration + 2000); // Добавляем 2 секунды задержки
+        }
+
         function showImage(src, duration) {
             gameImage.src = src;
             imageOverlay.classList.remove('hidden');
@@ -1665,10 +1704,11 @@
             }
 
             console.log("[DOM Loaded] Starting a new game.");
-            showImage('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+            playSound(audioOpen);
+            showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
-            }, 5000);
+            }, 7000); // 5000 (изображение) + 2000 (задержка)
         });
     </script>
 </body>
