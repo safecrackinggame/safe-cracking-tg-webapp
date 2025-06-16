@@ -318,7 +318,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100;
+            width: 100%;
             margin-bottom: 1rem;
             flex-wrap: wrap;
             gap: 0.5rem;
@@ -393,15 +393,15 @@
             max-height: 100%;
         }
         .footer-link {
-    margin-top: 1rem;
-    color: #4a90e2;
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-.dark-mode .footer-link {
-    color: #60a5fa;
-}
+            margin-top: 1rem;
+            color: #4a90e2;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .dark-mode .footer-link {
+            color: #60a5fa;
+        }
     </style>
 </head>
 <body>
@@ -438,19 +438,20 @@
         </div>
         <div class="bottom-bar">
             <div class="settings-bar">
-                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
+                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm" disabled></select>
             </div>
             <div class="settings-bar">
                 <select id="language-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
+        <p class="battle-mode-label text-base font-semibold mb-2" style="color: #4a5568;" data-translate="battle_mode_label">Режим интеллектуального сражения</p>
         
         <p id="reward-range-display" class="text-sm text-gray-600 mb-4"></p>
 
         <div class="stats-grid">
             <div><span data-translate="total_coins">Всего монет:</span> <span id="total-coins-display" class="font-semibold text-gray-700">0</span> SCG</div>
-            <div class="text-right"><span data-translate="games_played">Сыграно игр:</span> <span id="games-played-display" class="font-semibold text-gray-700">0</span></div>
-            <div><span data-translate="time">Время:</span> <span id="timer-display" class="font-semibold text-gray-700">00:00</span></div>
+            <div class="text-right"><span data-translate="battles_played">Сыграно батлов:</span> <span id="games-played-display" class="font-semibold text-gray-700">0</span></div>
+            <div><span data-translate="battle_time">Время батла:</span> <span id="timer-display" class="font-semibold text-gray-700">00:00</span></div>
             <div class="text-right"><span data-translate="best">Лучшее:</span> <span id="best-time-display" class="font-semibold text-gray-700">00:00</span></div>
         </div>
 
@@ -497,7 +498,7 @@
         <div id="image-overlay" class="image-overlay hidden">
             <img id="game-image" src="" alt="Game Image">
         </div>
-        <a href="./battles.html" class="footer-link" data-translate="battles_link">Интеллектуальные сражения</a>
+        <a href="https://safecrackinggame.github.io/safe-cracking-tg-webapp/" class="footer-link" data-translate="single_game_link">Одиночная игра</a>
     </div>
 
     <script>
@@ -607,6 +608,10 @@
             document.querySelector('.game-container').classList.toggle('dark-mode', isDarkMode);
             themeSunIcon.classList.toggle('hidden', !isDarkMode);
             themeMoonIcon.classList.toggle('hidden', isDarkMode);
+            const battleModeLabel = document.querySelector('.battle-mode-label');
+            if (battleModeLabel) {
+                battleModeLabel.style.color = isDarkMode ? '#f59e0b' : '#4a5568';
+            }
         }
 
         function toggleSound() {
@@ -1146,12 +1151,15 @@
                 unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
             }
 
-            const savedDifficultyKey = localStorage.getItem('currentDifficultyKey');
-            if (savedDifficultyKey && Difficulty[savedDifficultyKey]) {
-                currentDifficultyKey = savedDifficultyKey;
-            } else {
-                currentDifficultyKey = 'NORMAL';
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get('battleId');
+            if (battleId) {
+                const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+                if (battleData && battleData.difficulty) {
+                    currentDifficultyKey = battleData.difficulty;
+                }
             }
+            if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
             difficultySelector.value = currentDifficultyKey;
 
             const savedLanguage = localStorage.getItem('currentLanguage');
@@ -1639,15 +1647,7 @@
         });
 
         difficultySelector.addEventListener('change', (event) => {
-            const selectedDifficultyName = event.target.value;
-            if (Difficulty[selectedDifficultyName]) {
-                currentDifficultyKey = selectedDifficultyName;
-                gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-                console.log(`[Difficulty Selector] Changed difficulty to: ${translate(Difficulty[currentDifficultyKey].displayNameKey)}`);
-                resetGame();
-            } else {
-                console.error(`[Difficulty Selector] Unknown difficulty selected: ${selectedDifficultyName}`);
-            }
+            // Заблокировано, ничего не делаем
         });
 
         languageSelector.addEventListener('change', async (event) => {
@@ -1683,6 +1683,7 @@
                 }
             }
             difficultySelector.value = currentDifficultyKey;
+            difficultySelector.disabled = true;
             updateRewardRangeDisplay();
             console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
         }
@@ -1727,4 +1728,3 @@
             }, 7000); // 5000 (изображение) + 2000 (задержка)
         });
     </script>
-</html>
