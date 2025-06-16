@@ -1,8 +1,8 @@
 {
   "app_title": "Safe Cracking",
   "difficulty_normal": "Normal",
-  "difficulty_hard": "Hard",
-  "difficulty_crazy": "Crazy",
+  "difficulty_hard": "Hard x5 SCG",
+  "difficulty_crazy": "Crazy x25 SCG",
   "total_coins": "Total coins:",
   "games_played": "Games played:",
   "time": "Time:",
@@ -43,5 +43,6 @@
   "hint_rule_2_1": "Two digits are correct: one in place, the other not",
   "hint_rule_2_0": "Two digits are correct, but not in their places",
   "hint_rule_3_2": "Three digits are correct, two in place",
-  "common_rule_description": "Unknown rule"
+  "common_rule_description": "Unknown rule",
+  "battles_link": "Intellectual battles"
 }
