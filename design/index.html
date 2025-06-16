@@ -392,16 +392,6 @@
             max-width: 100%;
             max-height: 100%;
         }
-        .footer-link {
-    margin-top: 1rem;
-    color: #4a90e2;
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-.dark-mode .footer-link {
-    color: #60a5fa;
-}
     </style>
 </head>
 <body>
@@ -492,7 +482,6 @@
                 <p id="recovery-countdown" class="text-3xl font-bold text-blue-600 mb-6"></p>
                 <button id="recovery-ok-button" class="modal-button hidden" data-translate="ok_button">Хорошо</button>
             </div>
-            <a href="./battles.html" class="footer-link" data-translate="battles_link">Интеллектуальные сражения</a>
         </div>
 
         <div id="image-overlay" class="image-overlay hidden">
@@ -658,6 +647,8 @@
                 attempts: 5,
                 rewardRange: { min: 100, max: 500 },
                 hintCostRange: { min: 45, max: 225 },
+                recoveryTime: 10,
+                recoveryAmount: 500,
                 hintRules: [
                     HintRule.ONE_CORRECT_ONE_PLACE,
                     HintRule.TWO_CORRECT_ONE_PLACE,
@@ -671,6 +662,8 @@
                 attempts: 5,
                 rewardRange: { min: 500, max: 2500 },
                 hintCostRange: { min: 225, max: 1125 },
+                recoveryTime: 15,
+                recoveryAmount: 2500,
                 hintRules: [
                     HintRule.ONE_CORRECT_ONE_PLACE,
                     HintRule.TWO_CORRECT_ONE_PLACE,
@@ -1712,7 +1705,7 @@
 
             console.log("[DOM Loaded] Starting a new game.");
             playSound(audioOpen);
-            showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 3000);
+            showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
             }, 7000); // 5000 (изображение) + 2000 (задержка)
