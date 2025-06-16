@@ -424,12 +424,17 @@
         const scgStakeInput = document.getElementById('scg-stake');
         const scgStakeLabel = document.getElementById('scg-stake-label');
 
-        // Получаем и обновляем количество монет из localStorage
+        // Функция для получения и обновления количества монет
         function updateSCG() {
-            let userSCG = parseInt(localStorage.getItem('userSCG')) || 0;
-            scgStakeLabel.textContent = `Ставка SCG (Max ${userSCG}):`;
-            return userSCG;
+            let totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
+            scgStakeLabel.textContent = `Ставка SCG (Max ${totalCoins}):`;
+            return totalCoins;
         }
+
+        // Обновление при изменении localStorage
+        window.addEventListener('storage', () => {
+            updateSCG();
+        });
 
         createBattleBtn.addEventListener('click', () => {
             updateSCG();
@@ -440,11 +445,11 @@
             const gameCount = parseInt(gameCountInput.value) || 0;
             const participants = parseInt(participantsInput.value) || 0;
             const scgStake = parseInt(scgStakeInput.value) || 0;
-            const userSCG = updateSCG();
+            const totalCoins = updateSCG();
 
             const isValid = gameCount >= 1 && gameCount <= 10 &&
                            participants >= 1 && participants <= 10 &&
-                           scgStake > 0 && scgStake <= userSCG;
+                           scgStake > 0 && scgStake <= totalCoins;
 
             createBtn.disabled = !isValid;
         }
@@ -456,9 +461,9 @@
         createBtn.addEventListener('click', () => {
             if (!createBtn.disabled) {
                 const scgStake = parseInt(scgStakeInput.value);
-                let userSCG = updateSCG();
-                userSCG -= scgStake; // Уменьшаем монеты на ставку
-                localStorage.setItem('userSCG', userSCG); // Сохраняем обновлённое значение
+                let totalCoins = updateSCG();
+                totalCoins -= scgStake; // Уменьшаем монеты на ставку
+                localStorage.setItem('totalCoins', totalCoins); // Сохраняем обновлённое значение
                 updateSCG(); // Обновляем отображение
                 modal.style.display = 'none';
                 console.log('Батл создан с параметрами:', {
