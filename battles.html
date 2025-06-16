@@ -458,25 +458,36 @@
             input.addEventListener('input', validateForm);
         });
 
-        createBtn.addEventListener('click', () => {
-            if (!createBtn.disabled) {
-                const scgStake = parseInt(scgStakeInput.value);
-                let totalCoins = updateSCG();
-                totalCoins -= scgStake; // Уменьшаем монеты на ставку
-                localStorage.setItem('totalCoins', totalCoins); // Сохраняем обновлённое значение
-                updateSCG(); // Обновляем отображение
-                modal.style.display = 'none';
-                console.log('Батл создан с параметрами:', {
-                    type: document.getElementById('battle-type').value,
-                    difficulty: document.getElementById('difficulty').value,
-                    gameCount: gameCountInput.value,
-                    hints: document.getElementById('hints').value,
-                    scgStake: scgStakeInput.value,
-                    participants: participantsInput.value
-                });
-                // Здесь можно добавить логику завершения батла и вознаграждения
-            }
-        });
+        // В <script> battles.html, заменяем createBtn.addEventListener
+createBtn.addEventListener('click', () => {
+    if (!createBtn.disabled) {
+        const scgStake = parseInt(scgStakeInput.value);
+        let totalCoins = updateSCG();
+        totalCoins -= scgStake; // Уменьшаем монеты на ставку
+        localStorage.setItem('totalCoins', totalCoins); // Сохраняем обновлённое значение
+        updateSCG(); // Обновляем отображение
+
+        // Генерируем уникальный ID батла
+        const battleId = crypto.randomUUID().replace(/-/g, '').substring(0, 8); // Короткий уникальный ID
+        const battleData = {
+            id: battleId,
+            type: document.getElementById('battle-type').value,
+            difficulty: document.getElementById('difficulty').value,
+            gameCount: gameCountInput.value,
+            hints: document.getElementById('hints').value,
+            scgStake: scgStake,
+            participants: parseInt(participantsInput.value),
+            currentParticipants: 1, // Начинаем с создателя
+            creatorTgId: Telegram.WebApp.initDataUnsafe?.user?.id || 'testUser', // Временное сохранение Telegram ID
+            status: 'waiting' // Ожидание других игроков
+        };
+        localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData)); // Сохраняем данные батла
+
+        // Перенаправляем на страницу батла
+        window.location.href = `./${battleId}`;
+        modal.style.display = 'none';
+    }
+});
 
         document.addEventListener('click', (event) => {
             if (event.target === modal) {
