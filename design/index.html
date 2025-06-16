@@ -1029,7 +1029,7 @@
 
         async function loadTranslations(langCode) {
             try {
-                const response = await fetch(`./locales/${langCode}.json`);
+                const response = await fetch(`/safe-cracking-tg-webapp/design/locales/${langCode}.json`);
                 if (!response.ok) {
                     console.warn(`[Localization] Translations for ${langCode} not found, falling back to 'en'.`);
                     if (langCode !== 'en') {
