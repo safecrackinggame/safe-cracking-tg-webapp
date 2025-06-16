@@ -43,11 +43,18 @@
         }
         .top-bar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start;
             align-items: center;
             width: 100%;
             padding: 0.5rem 0;
             flex-wrap: nowrap;
+        }
+        .title-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin-top: 0.5rem;
         }
         .bottom-bar {
             display: flex;
@@ -87,13 +94,7 @@
             width: 32px;
             height: 32px;
         }
-        h1 {
-            font-size: 2rem; /* Увеличен размер шрифта */
-            font-weight: bold;
-            color: #1a202c;
-            margin: 0;
-        }
-        body.dark-mode h1 {
+        .dark-mode h1 {
             color: #e2e8f0;
         }
         select {
@@ -128,9 +129,6 @@
         <div class="top-bar">
             <div class="settings-bar">
                 <img id="logo-image" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/safe_cracking.webp" alt="Logo" class="logo-image">
-            </div>
-            <div class="settings-bar">
-                <h1>Safe Cracking</h1>
                 <button id="theme-toggle-btn" class="theme-toggle-btn">
                     <svg id="theme-sun-icon" class="w-6 h-6" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <circle cx="12" cy="12" r="5" fill="currentColor"/>
@@ -152,6 +150,9 @@
                     </svg>
                 </button>
             </div>
+        </div>
+        <div class="title-bar">
+            <h1 class="text-3xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
         </div>
         <div class="bottom-bar">
             <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
