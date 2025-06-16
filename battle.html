@@ -249,6 +249,14 @@
             border-color: #4a90e2;
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
         }
+        select:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .dark-mode select:disabled {
+            background-color: #6b7280;
+        }
         .hints-container {
             width: 100%;
             background-color: #e2e8f0;
@@ -318,7 +326,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            width: 100;
+            width: 100%;
             margin-bottom: 1rem;
             flex-wrap: wrap;
             gap: 0.5rem;
@@ -393,15 +401,24 @@
             max-height: 100%;
         }
         .footer-link {
-    margin-top: 1rem;
-    color: #4a90e2;
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-.dark-mode .footer-link {
-    color: #60a5fa;
-}
+            margin-top: 1rem;
+            color: #4a90e2;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .dark-mode .footer-link {
+            color: #60a5fa;
+        }
+        .battle-mode-label {
+            color: #4a5568;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            text-align: center;
+        }
+        .dark-mode .battle-mode-label {
+            color: #a0aec0;
+        }
     </style>
 </head>
 <body>
@@ -438,20 +455,21 @@
         </div>
         <div class="bottom-bar">
             <div class="settings-bar">
-                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm"></select>
+                <select id="difficulty-selector" class="p-2 border rounded-lg shadow-sm" disabled></select>
             </div>
             <div class="settings-bar">
                 <select id="language-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
+        <p class="battle-mode-label" data-translate="battle_mode_label">Режим интеллектуального сражения</p>
         
         <p id="reward-range-display" class="text-sm text-gray-600 mb-4"></p>
 
         <div class="stats-grid">
             <div><span data-translate="total_coins">Всего монет:</span> <span id="total-coins-display" class="font-semibold text-gray-700">0</span> SCG</div>
-            <div class="text-right"><span data-translate="games_played">Сыграно игр:</span> <span id="games-played-display" class="font-semibold text-gray-700">0</span></div>
-            <div><span data-translate="time">Время:</span> <span id="timer-display" class="font-semibold text-gray-700">00:00</span></div>
-            <div class="text-right"><span data-translate="best">Лучшее:</span> <span id="best-time-display" class="font-semibold text-gray-700">00:00</span></div>
+            <div class="text-right"><span data-translate="battles_played">Сыграно батлов:</span> <span id="battles-played-display" class="font-semibold text-gray-700">0</span></div>
+            <div><span data-translate="battle_time">Время батла:</span> <span id="battle-time-display" class="font-semibold text-gray-700">00:00</span></div>
+            <div class="text-right"><span data-translate="best_battle_time">Лучшее время батла:</span> <span id="best-battle-time-display" class="font-semibold text-gray-700">00:00</span></div>
         </div>
 
         <div class="text-md italic mb-6 text-gray-600" id="message-display" data-translate="guess_code_message" data-translate-params='{"codeLength":3}'>Угадайте 3-значный код!</div>
@@ -497,7 +515,7 @@
         <div id="image-overlay" class="image-overlay hidden">
             <img id="game-image" src="" alt="Game Image">
         </div>
-        <a href="./battles.html" class="footer-link" data-translate="battles_link">Интеллектуальные сражения</a>
+        <a href="https://safecrackinggame.github.io/safe-cracking-tg-webapp/" class="footer-link" data-translate="single_game_link">Одиночная игра</a>
     </div>
 
     <script>
@@ -506,9 +524,9 @@
 
         // --- DOM Elements ---
         const totalCoinsDisplay = document.getElementById('total-coins-display');
-        const gamesPlayedDisplay = document.getElementById('games-played-display');
-        const bestTimeDisplay = document.getElementById('best-time-display');
-        const timerDisplay = document.getElementById('timer-display');
+        const battlesPlayedDisplay = document.getElementById('battles-played-display');
+        const bestBattleTimeDisplay = document.getElementById('best-battle-time-display');
+        const battleTimeDisplay = document.getElementById('battle-time-display');
         const messageDisplay = document.getElementById('message-display');
         const hintsContainer = document.getElementById('hints-container');
         const guessInputContainer = document.getElementById('guess-input-container');
@@ -549,25 +567,27 @@
         // --- Game State Variables ---
         let totalCoins = 0;
         const INITIAL_COINS = 100;
-        let stats = {
-            NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-            HARD: { gamesPlayed: 0, bestTime: Infinity },
-            CRAZY: { gamesPlayed: 0, bestTime: Infinity }
+        let battleStats = {
+            NORMAL: { battlesPlayed: 0, bestBattleTime: Infinity },
+            HARD: { battlesPlayed: 0, bestBattleTime: Infinity },
+            CRAZY: { battlesPlayed: 0, bestBattleTime: Infinity }
         };
         let currentDifficultyKey = 'NORMAL';
         let currentHintCost = 0;
         let hintsBoughtThisGame = 0;
         let revealedDigits = new Map();
         let lockedDigits = new Map();
-        let timerInterval;
-        let startTime;
-        let currentElapsedTime = 0;
+        let battleTimerInterval;
+        let battleStartTime;
+        let currentBattleTime = 0;
         let isGameInProgress = false;
         let activeHintIndex = -1;
         let coinRecoveryTimer = null;
         let coinRecoveryCountdownSeconds = 0;
         let isDarkMode = localStorage.getItem('isDarkMode') === 'true';
         let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
+        let totalGamesInBattle = 1; // По умолчанию 1 игра в батле
+        let gamesPlayedInBattle = 0;
 
         let unlockedDifficulties = {
             NORMAL: true,
@@ -1086,55 +1106,55 @@
         }
 
         function saveGameData() {
-            localStorage.setItem('totalCoins', totalCoins);
-            const serializableStats = JSON.parse(JSON.stringify(stats));
+            localStorage.setItem('battleTotalCoins', totalCoins);
+            const serializableStats = JSON.parse(JSON.stringify(battleStats));
             for (const diffKey in serializableStats) {
-                if (serializableStats[diffKey].bestTime === Infinity) {
-                    serializableStats[diffKey].bestTime = null;
+                if (serializableStats[diffKey].bestBattleTime === Infinity) {
+                    serializableStats[diffKey].bestBattleTime = null;
                 }
             }
-            localStorage.setItem('stats', JSON.stringify(serializableStats));
-            localStorage.setItem('currentDifficultyKey', currentDifficultyKey);
-            localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
-            localStorage.setItem('currentLanguage', currentLanguage);
+            localStorage.setItem('battleStats', JSON.stringify(serializableStats));
+            localStorage.setItem('battleCurrentDifficultyKey', currentDifficultyKey);
+            localStorage.setItem('battleUnlockedDifficulties', JSON.stringify(unlockedDifficulties));
+            localStorage.setItem('battleCurrentLanguage', currentLanguage);
             localStorage.setItem('isDarkMode', isDarkMode);
             localStorage.setItem('isSoundEnabled', isSoundEnabled);
-            console.log("[Save] Game data saved.");
+            console.log("[Save] Battle game data saved.");
         }
 
         function loadGameData() {
-            console.log("[Load] Loading game data...");
-            totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
+            console.log("[Load] Loading battle game data...");
+            totalCoins = parseInt(localStorage.getItem('battleTotalCoins') || INITIAL_COINS);
 
-            const savedStats = localStorage.getItem('stats');
+            const savedStats = localStorage.getItem('battleStats');
             if (savedStats) {
                 try {
-                    stats = JSON.parse(savedStats);
-                    for (const diffKey in stats) {
-                        if (stats[diffKey].bestTime === null) {
-                            stats[diffKey].bestTime = Infinity;
+                    battleStats = JSON.parse(savedStats);
+                    for (const diffKey in battleStats) {
+                        if (battleStats[diffKey].bestBattleTime === null) {
+                            battleStats[diffKey].bestBattleTime = Infinity;
                         }
-                        if (typeof stats[diffKey].gamesPlayed === 'undefined') stats[diffKey].gamesPlayed = 0;
-                        if (typeof stats[diffKey].bestTime === 'undefined') stats[diffKey].bestTime = Infinity;
+                        if (typeof battleStats[diffKey].battlesPlayed === 'undefined') battleStats[diffKey].battlesPlayed = 0;
+                        if (typeof battleStats[diffKey].bestBattleTime === 'undefined') battleStats[diffKey].bestBattleTime = Infinity;
                     }
                 } catch (e) {
-                    console.error("[Load] Error parsing saved stats, resetting.", e);
-                    stats = {
-                        NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                        HARD: { gamesPlayed: 0, bestTime: Infinity },
-                        CRAZY: { gamesPlayed: 0, bestTime: Infinity }
+                    console.error("[Load] Error parsing saved battle stats, resetting.", e);
+                    battleStats = {
+                        NORMAL: { battlesPlayed: 0, bestBattleTime: Infinity },
+                        HARD: { battlesPlayed: 0, bestBattleTime: Infinity },
+                        CRAZY: { battlesPlayed: 0, bestBattleTime: Infinity }
                     };
                 }
             } else {
-                console.log("[Load] No saved stats found, initializing new stats.");
-                stats = {
-                    NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                    HARD: { gamesPlayed: 0, bestTime: Infinity },
-                    CRAZY: { gamesPlayed: 0, bestTime: Infinity }
+                console.log("[Load] No saved battle stats found, initializing new stats.");
+                battleStats = {
+                    NORMAL: { battlesPlayed: 0, bestBattleTime: Infinity },
+                    HARD: { battlesPlayed: 0, bestBattleTime: Infinity },
+                    CRAZY: { battlesPlayed: 0, bestBattleTime: Infinity }
                 };
             }
 
-            const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
+            const savedUnlockedDifficulties = localStorage.getItem('battleUnlockedDifficulties');
             if (savedUnlockedDifficulties) {
                 try {
                     unlockedDifficulties = JSON.parse(savedUnlockedDifficulties);
@@ -1146,15 +1166,23 @@
                 unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
             }
 
-            const savedDifficultyKey = localStorage.getItem('currentDifficultyKey');
+            const savedDifficultyKey = localStorage.getItem('battleCurrentDifficultyKey');
             if (savedDifficultyKey && Difficulty[savedDifficultyKey]) {
                 currentDifficultyKey = savedDifficultyKey;
             } else {
-                currentDifficultyKey = 'NORMAL';
+                const urlParams = new URLSearchParams(window.location.search);
+                const battleId = urlParams.get('battleId');
+                if (battleId) {
+                    const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+                    if (battleData && battleData.difficulty) {
+                        currentDifficultyKey = battleData.difficulty;
+                    }
+                }
+                if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
             }
             difficultySelector.value = currentDifficultyKey;
 
-            const savedLanguage = localStorage.getItem('currentLanguage');
+            const savedLanguage = localStorage.getItem('battleCurrentLanguage');
             const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
             const browserLanguage = navigator.language.split('-')[0];
 
@@ -1174,13 +1202,22 @@
 
             gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
 
-            console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Unlocked:", unlockedDifficulties, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get('battleId');
+            if (battleId) {
+                const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+                if (battleData && battleData.games) {
+                    totalGamesInBattle = battleData.games;
+                }
+            }
+
+            console.log("[Load] Battle game data loaded: Total Coins:", totalCoins, "Stats:", battleStats, "Current Difficulty:", currentDifficultyKey, "Unlocked:", unlockedDifficulties, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled, "Total Games in Battle:", totalGamesInBattle);
         }
 
         function resetGame() {
             console.log("[Game Reset] Resetting game...");
             stopTimer();
-            currentElapsedTime = 0;
+            currentBattleTime = 0; // Сбрасываем только для новой игры внутри батла
             hintsBoughtThisGame = 0;
             revealedDigits.clear();
             lockedDigits.clear();
@@ -1223,13 +1260,24 @@
                 displayHints(tempResetResult.hints, tempResetResult.hintRules);
 
                 stopTimer();
-                timerDisplay.textContent = formatTime(0);
+                battleTimeDisplay.textContent = formatTime(0);
                 Telegram.WebApp.setHeaderColor('secondary_bg_color');
+            }
+
+            gamesPlayedInBattle++;
+            if (gamesPlayedInBattle >= totalGamesInBattle) {
+                stopTimer();
+                battleStats[currentDifficultyKey].battlesPlayed++;
+                if (currentBattleTime < battleStats[currentDifficultyKey].bestBattleTime) {
+                    battleStats[currentDifficultyKey].bestBattleTime = currentBattleTime;
+                }
+                updateUI();
+                saveGameData();
             }
 
             updateUI();
             saveGameData();
-            console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+            console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode(), "Games Played in Battle:", gamesPlayedInBattle, "Total Games in Battle:", totalGamesInBattle);
         }
 
         function checkGuess() {
@@ -1237,14 +1285,10 @@
             const guessResult = gameLogic.makeGuess(guessArray);
 
             if (guessResult.isWin) {
-                stopTimer();
+                stopTimer(); // Останавливаем таймер только для текущей игры
                 isGameInProgress = false;
                 const earnedCoins = guessResult.reward;
                 totalCoins += earnedCoins;
-                stats[currentDifficultyKey].gamesPlayed++;
-                if (currentElapsedTime < stats[currentDifficultyKey].bestTime) {
-                    stats[currentDifficultyKey].bestTime = currentElapsedTime;
-                }
 
                 if (!unlockedDifficulties.HARD && totalCoins >= UNLOCK_COSTS.HARD) {
                     unlockedDifficulties.HARD = true;
@@ -1277,16 +1321,19 @@
                 setTimeout(() => {
                     Telegram.WebApp.showPopup({
                         title: translate('victory_title'),
-                        message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
+                        message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentBattleTime)}\n${translate('best_time')}: ${formatTime(battleStats[currentDifficultyKey].bestBattleTime)}`,
                         buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
                     });
                     Telegram.WebApp.setHeaderColor('accent_text_color');
                 }, 2000);
+
+                if (gamesPlayedInBattle < totalGamesInBattle) {
+                    setTimeout(resetGame, 3000); // Автоматический переход к следующей игре
+                }
             } else if (guessResult.isGameOver) {
-                stopTimer();
+                stopTimer(); // Останавливаем таймер только для текущей игры
                 isGameInProgress = false;
 
-                stats[currentDifficultyKey].gamesPlayed++;
                 updateUI();
                 saveGameData();
 
@@ -1305,6 +1352,10 @@
                     });
                     Telegram.WebApp.setHeaderColor('destructive_text_color');
                 }, 2000);
+
+                if (gamesPlayedInBattle < totalGamesInBattle) {
+                    setTimeout(resetGame, 3000); // Автоматический переход к следующей игре
+                }
             } else {
                 playSound(audioError);
                 showMessage(translate('incorrect_guess_message', {attemptsLeft: guessResult.attemptsLeft}), 'orange');
@@ -1333,7 +1384,6 @@
                 return;
             }
 
-            // Цена подсказки зависит от ставки батла (45% от scgStake)
             const urlParams = new URLSearchParams(window.location.search);
             const battleId = urlParams.get('battleId');
             let battleData = null;
@@ -1343,7 +1393,11 @@
             if (battleData && battleData.scgStake) {
                 currentHintCost = Math.floor(battleData.scgStake * 0.45);
             } else {
-                currentHintCost = gameLogic.getHintCost(); // Фallback на случай, если нет данных батла
+                currentHintCost = gameLogic.getHintCost();
+            }
+            if (battleData && !battleData.hintsEnabled) {
+                showMessage(translate('hints_disabled'), 'red');
+                return;
             }
 
             activeHintIndex = digitIndex;
@@ -1531,9 +1585,10 @@
 
         function updateUI() {
             totalCoinsDisplay.textContent = formatLargeNumber(totalCoins);
-            const currentStats = stats[currentDifficultyKey];
-            gamesPlayedDisplay.textContent = currentStats.gamesPlayed;
-            bestTimeDisplay.textContent = formatTime(currentStats.bestTime);
+            const currentStats = battleStats[currentDifficultyKey];
+            battlesPlayedDisplay.textContent = currentStats.battlesPlayed;
+            bestBattleTimeDisplay.textContent = formatTime(currentStats.bestBattleTime);
+            battleTimeDisplay.textContent = formatTime(currentBattleTime);
             updateRewardRangeDisplay();
 
             const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
@@ -1562,7 +1617,14 @@
                 downButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed;
                 digitDisplay.style.cursor = (!isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed) ? 'default' : 'pointer';
 
-                hintButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed;
+                const urlParams = new URLSearchParams(window.location.search);
+                const battleId = urlParams.get('battleId');
+                let battleData = null;
+                if (battleId) {
+                    battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+                }
+                const areHintsDisabled = battleData && !battleData.hintsEnabled;
+                hintButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed || areHintsDisabled;
                 
                 if (isDigitLockedOrRevealed) {
                     digitDisplay.textContent = revealedDigits.has(index) ? revealedDigits.get(index) : lockedDigits.get(index);
@@ -1603,16 +1665,16 @@
         }
 
         function startTimer() {
-            clearInterval(timerInterval);
-            startTime = Date.now();
-            timerInterval = setInterval(() => {
-                currentElapsedTime = Math.floor((Date.now() - startTime) / 1000);
-                timerDisplay.textContent = formatTime(currentElapsedTime);
+            clearInterval(battleTimerInterval);
+            if (!battleStartTime) battleStartTime = Date.now();
+            battleTimerInterval = setInterval(() => {
+                currentBattleTime = Math.floor((Date.now() - battleStartTime) / 1000);
+                battleTimeDisplay.textContent = formatTime(currentBattleTime);
             }, 1000);
         }
 
         function stopTimer() {
-            clearInterval(timerInterval);
+            clearInterval(battleTimerInterval);
         }
 
         function showImageWithDelay(src, duration) {
@@ -1620,7 +1682,7 @@
             imageOverlay.classList.remove('hidden');
             setTimeout(() => {
                 imageOverlay.classList.add('hidden');
-            }, duration + 2000); // Добавляем 2 секунды задержки
+            }, duration + 2000);
         }
 
         function showImage(src, duration) {
@@ -1639,15 +1701,7 @@
         });
 
         difficultySelector.addEventListener('change', (event) => {
-            const selectedDifficultyName = event.target.value;
-            if (Difficulty[selectedDifficultyName]) {
-                currentDifficultyKey = selectedDifficultyName;
-                gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-                console.log(`[Difficulty Selector] Changed difficulty to: ${translate(Difficulty[currentDifficultyKey].displayNameKey)}`);
-                resetGame();
-            } else {
-                console.error(`[Difficulty Selector] Unknown difficulty selected: ${selectedDifficultyName}`);
-            }
+            // Заблокировано, ничего не делаем
         });
 
         languageSelector.addEventListener('change', async (event) => {
@@ -1683,6 +1737,7 @@
                 }
             }
             difficultySelector.value = currentDifficultyKey;
+            difficultySelector.disabled = true; // Блокируем выбор сложности
             updateRewardRangeDisplay();
             console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
         }
@@ -1696,35 +1751,3 @@
                 option.textContent = supportedLanguages[langCode];
                 languageSelector.appendChild(option);
             }
-            languageSelector.value = currentLanguage;
-            console.log("[Language Selector] Selector value set to:", currentLanguage);
-        }
-
-        function updateRewardRangeDisplay() {
-            rewardRangeDisplay.textContent = '';
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log("[DOM Loaded] DOM content fully loaded.");
-            loadGameData();
-            populateLanguageSelector();
-            populateDifficultySelector();
-
-            await loadTranslations(currentLanguage);
-
-            if (totalCoins >= UNLOCK_COSTS.HARD) {
-                unlockedDifficulties.HARD = true;
-            }
-            if (totalCoins >= UNLOCK_COSTS.CRAZY) {
-                unlockedDifficulties.CRAZY = true;
-            }
-
-            console.log("[DOM Loaded] Starting a new game.");
-            playSound(audioOpen);
-            showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
-            setTimeout(() => {
-                resetGame();
-            }, 7000); // 5000 (изображение) + 2000 (задержка)
-        });
-    </script>
-</html>
