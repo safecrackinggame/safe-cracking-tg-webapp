@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Safe Cracking TG - Battles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.googleapis.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.googleapis.com/firebasejs/9.23.0/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color: 0.3s, color: 0.3s;
+        }
+        .game-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 1rem;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            box-sizing: border-box;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .game-container.dark-mode {
+            background-color: #2d3748;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+        .dark-mode .text-gray-800 { color: #e2e8f0; }
+        .dark-mode .text-gray-600 { color: #a0aec0; }
+        .dark-mode .bg-blue-500 { background-color: #1e40af; }
+        .dark-mode .hover:bg-blue-600:hover { background-color: #1e3a8a; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные сражения</h1>
+        <p class="text-lg text-gray-600 mb-6" data-translate="battles_challenge">Вызови друга на интеллектуальный батл!</p>
+        <button id="create-battle-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors mb-6" data-translate="create-battle-btn">Создать батл</button>
+        <h2 class="text-xl font-semibold mb-4" data-translate="open_battles">Открытные батлы</h2>
+        <div id="battles-list" class="w-full"></div>
+    </div>
+</body>
+<script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    // Firebase configuration (замените на свои данные)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        databaseURL: "YOUR_DATABASE_URL",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Заглушка для JavaScript
+    const createBattleBtn = document.getElementById('create-battle-btn');
+    createBattleBtn.addEventListener('click', () => {
+        alert('Создание батла скоро будет доступно!');
+    });
+</script>
+</html>
 
