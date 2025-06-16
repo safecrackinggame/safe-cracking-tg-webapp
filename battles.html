@@ -424,32 +424,15 @@
         const scgStakeInput = document.getElementById('scg-stake');
         const scgStakeLabel = document.getElementById('scg-stake-label');
 
-        // Функция для получения количества монет с главной страницы
-        function fetchUserSCG() {
-            return new Promise((resolve) => {
-                fetch('https://safecrackinggame.github.io/safe-cracking-tg-webapp/')
-                    .then(response => response.text())
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-                        const coinElement = doc.querySelector('p:has(text["Всего монет:"])');
-                        if (coinElement) {
-                            const match = coinElement.textContent.match(/Всего монет: (\d+) SCG/);
-                            if (match) {
-                                const scg = parseInt(match[1]);
-                                localStorage.setItem('userSCG', scg); // Сохраняем в localStorage
-                                resolve(scg);
-                            }
-                        }
-                        resolve(0); // Если не нашли, возвращаем 0
-                    })
-                    .catch(() => resolve(0)); // Ошибка сети
-            });
+        // Получаем и обновляем количество монет из localStorage
+        function updateSCG() {
+            let userSCG = parseInt(localStorage.getItem('userSCG')) || 0;
+            scgStakeLabel.textContent = `Ставка SCG (Max ${userSCG}):`;
+            return userSCG;
         }
 
-        createBattleBtn.addEventListener('click', async () => {
-            const userSCG = await fetchUserSCG();
-            scgStakeLabel.textContent = `Ставка SCG (Max ${userSCG}):`;
+        createBattleBtn.addEventListener('click', () => {
+            updateSCG();
             modal.style.display = 'flex';
         });
 
@@ -457,7 +440,7 @@
             const gameCount = parseInt(gameCountInput.value) || 0;
             const participants = parseInt(participantsInput.value) || 0;
             const scgStake = parseInt(scgStakeInput.value) || 0;
-            const userSCG = parseInt(localStorage.getItem('userSCG')) || 0;
+            const userSCG = updateSCG();
 
             const isValid = gameCount >= 1 && gameCount <= 10 &&
                            participants >= 1 && participants <= 10 &&
@@ -472,6 +455,11 @@
 
         createBtn.addEventListener('click', () => {
             if (!createBtn.disabled) {
+                const scgStake = parseInt(scgStakeInput.value);
+                let userSCG = updateSCG();
+                userSCG -= scgStake; // Уменьшаем монеты на ставку
+                localStorage.setItem('userSCG', userSCG); // Сохраняем обновлённое значение
+                updateSCG(); // Обновляем отображение
                 modal.style.display = 'none';
                 console.log('Батл создан с параметрами:', {
                     type: document.getElementById('battle-type').value,
@@ -481,6 +469,7 @@
                     scgStake: scgStakeInput.value,
                     participants: participantsInput.value
                 });
+                // Здесь можно добавить логику завершения батла и вознаграждения
             }
         });
 
