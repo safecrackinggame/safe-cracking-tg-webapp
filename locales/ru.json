@@ -27,13 +27,13 @@
   "safe_cracked_win": "Сейф открыт! Вы заработали {earnedCoins} SCG!",
   "your_time": "Ваше время:",
   "best_time": "Лучшее время:",
-  "game_over_message": "Попытки закончились. Код был: {secretCode}.",
+  "game_over_message": "Тревога! Охрана предупреждена. Уровень перезапускается... Код был: {secretCode}.",
   "incorrect_guess_message": "Неверно! Осталось попыток: {attemptsLeft}.",
   "game_start_message": "Выберите действие.",
   "new_level_unlocked": "Новый уровень разблокирован!",
   "unlocked_level_message": "Вы разблокировали уровень \"{levelName}\"!",
   "hooray_button": "Ура!",
-  "victory_title": "Победа!",
+  "victory_title": "Сейф взломан!",
   "great_button": "Отлично!",
   "defeat_title": "Поражение!",
   "understood_button": "Понятно",
@@ -43,5 +43,6 @@
   "hint_rule_2_1": "Две цифры верны: одна на месте, другая нет",
   "hint_rule_2_0": "Две цифры верны, но не на своих местах",
   "hint_rule_3_2": "Три цифры верны, две на месте",
-  "common_rule_description": "Неизвестное правило"
+  "common_rule_description": "Неизвестное правило",
+  "battles_link": "Интеллектуальные сражения"
 }
