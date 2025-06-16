@@ -1333,8 +1333,17 @@
                 return;
             }
 
-            if (currentHintCost === 0) {
-                currentHintCost = gameLogic.getHintCost();
+            // Цена подсказки зависит от ставки батла (45% от scgStake)
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get('battleId');
+            let battleData = null;
+            if (battleId) {
+                battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+            }
+            if (battleData && battleData.scgStake) {
+                currentHintCost = Math.floor(battleData.scgStake * 0.45);
+            } else {
+                currentHintCost = gameLogic.getHintCost(); // Фallback на случай, если нет данных батла
             }
 
             activeHintIndex = digitIndex;
@@ -1718,5 +1727,4 @@
             }, 7000); // 5000 (изображение) + 2000 (задержка)
         });
     </script>
-</body>
 </html>
