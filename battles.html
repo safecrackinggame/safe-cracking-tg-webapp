@@ -46,8 +46,15 @@
         .dark-mode .text-gray-800 { color: #e2e8f0; }
         .dark-mode .text-gray-700 { color: #cbd5e0; }
         .dark-mode .text-gray-600 { color: #a0aec0; }
+        .dark-mode .bg-gray-200 { background-color: #4a5568; }
+        .dark-mode .bg-white { background-color: #2d3748; }
+        .dark-mode .bg-gray-50 { background-color: #1f2937; }
+        .dark-mode .bg-green-500 { background-color: #059669; }
         .dark-mode .bg-blue-500 { background-color: #1e40af; }
+        .dark-mode .hover:bg-green-600:hover { background-color: #047857; }
         .dark-mode .hover:bg-blue-600:hover { background-color: #1e3a8a; }
+        .dark-mode .border-gray-300 { border-color: #4a5568; }
+        .dark-mode .bg-gray-400 { background-color: #6b7280; }
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -233,7 +240,7 @@
                 <select id="language-selector" class="p-2 border rounded-lg shadow-sm"></select>
             </div>
         </div>
-        <h1 class="text-lg font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные бытлы</h1>
+        <h1 class="text-lg font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные сражения</h1>
         <p class="text-lg text-gray-600 mb-6" data-translate="battles_challenge">Вызови друга на интеллектуальный батл!</p>
         <button id="create-battle-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors mb-6" data-translate="create-battle-btn">Создать батл</button>
         <h2 class="text-xl font-semibold mb-4" data-translate="open_battles">Открытые батлы</h2>
@@ -436,6 +443,9 @@
                 console.error("Error parsing data-translate-params for key:", key, e);
             }
             element.textContent = translate(key, params);
+            if (element.hasAttribute('data-translate-placeholder')) {
+                element.placeholder = translate(element.dataset.translatePlaceholder);
+            }
         });
         populateDifficultySelector();
         populateLanguageSelector();
@@ -482,6 +492,8 @@
     document.addEventListener('DOMContentLoaded', async () => {
         const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code || 'en';
         await loadTranslations(telegramLanguage);
+        updateTheme();
+        updateSoundIcon();
     });
 </script>
 </html>
