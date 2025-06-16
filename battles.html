@@ -300,17 +300,17 @@
                 <option value="Hard">Hard</option>
                 <option value="Crazy">Crazy</option>
             </select>
-            <label for="game-count">Количество игр (до 10):</label>
-            <input type="number" id="game-count" min="1" max="10" placeholder="Введите число">
+            <label for="game-count">Количество игр (от 1 до 10):</label>
+            <input type="number" id="game-count" min="1" max="10" value="1" placeholder="Введите число">
+            <label id="scg-stake-label">Ставка SCG (Max 0):</label>
+            <input type="number" id="scg-stake" min="0" placeholder="Введите число">
+            <label for="participants">Количество участников (от 2 до 10):</label>
+            <input type="number" id="participants" min="2" max="10" value="2" placeholder="Введите число">
             <label for="hints">Подсказки:</label>
             <select id="hints">
                 <option value="on">Вкл</option>
                 <option value="off">Выкл</option>
             </select>
-            <label id="scg-stake-label">Ставка SCG (Max 0):</label>
-            <input type="number" id="scg-stake" min="0" placeholder="Введите число">
-            <label for="participants">Количество участников (до 10):</label>
-            <input type="number" id="participants" min="1" max="10" placeholder="Введите число">
             <button id="create-btn" class="create-btn" disabled>Создать</button>
         </div>
     </div>
@@ -388,7 +388,7 @@
         'uk': 'Українська',
         'id': 'Bahasa Indonesia'
     };
-    let currentLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code || 'en';
+    let currentLanguage = localStorage.getItem('currentLanguage') || Telegram.WebApp.initDataUnsafe?.user?.language_code || 'en';
 
     function populateLanguageSelector() {
         if (languageSelector) {
@@ -409,6 +409,7 @@
 
     languageSelector?.addEventListener('change', (event) => {
         currentLanguage = event.target.value;
+        localStorage.setItem('currentLanguage', currentLanguage); // Сохраняем язык
         console.log(`[Language Selector] Changed to: ${event.target.value}`);
     });
 
@@ -434,6 +435,7 @@
         // Обновление при изменении localStorage
         window.addEventListener('storage', () => {
             updateSCG();
+            validateForm(); // Перепроверяем форму при изменении монет
         });
 
         createBattleBtn.addEventListener('click', () => {
@@ -442,13 +444,13 @@
         });
 
         function validateForm() {
-            const gameCount = parseInt(gameCountInput.value) || 0;
-            const participants = parseInt(participantsInput.value) || 0;
+            const gameCount = parseInt(gameCountInput.value) || 1;
+            const participants = parseInt(participantsInput.value) || 2;
             const scgStake = parseInt(scgStakeInput.value) || 0;
             const totalCoins = updateSCG();
 
             const isValid = gameCount >= 1 && gameCount <= 10 &&
-                           participants >= 1 && participants <= 10 &&
+                           participants >= 2 && participants <= 10 &&
                            scgStake > 0 && scgStake <= totalCoins;
 
             createBtn.disabled = !isValid;
@@ -458,42 +460,45 @@
             input.addEventListener('input', validateForm);
         });
 
-        // В <script> battles.html, заменяем createBtn.addEventListener
-createBtn.addEventListener('click', () => {
-    if (!createBtn.disabled) {
-        const scgStake = parseInt(scgStakeInput.value);
-        let totalCoins = updateSCG();
-        totalCoins -= scgStake; // Уменьшаем монеты на ставку
-        localStorage.setItem('totalCoins', totalCoins); // Сохраняем обновлённое значение
-        updateSCG(); // Обновляем отображение
+        createBtn.addEventListener('click', () => {
+            if (!createBtn.disabled) {
+                const scgStake = parseInt(scgStakeInput.value);
+                let totalCoins = updateSCG();
+                totalCoins -= scgStake; // Уменьшаем монеты на ставку
+                localStorage.setItem('totalCoins', totalCoins); // Сохраняем обновлённое значение
+                updateSCG(); // Обновляем отображение
 
-        // Генерируем уникальный ID батла
-        const battleId = crypto.randomUUID().replace(/-/g, '').substring(0, 8); // Короткий уникальный ID
-        const battleData = {
-            id: battleId,
-            type: document.getElementById('battle-type').value,
-            difficulty: document.getElementById('difficulty').value,
-            gameCount: gameCountInput.value,
-            hints: document.getElementById('hints').value,
-            scgStake: scgStake,
-            participants: parseInt(participantsInput.value),
-            currentParticipants: 1, // Начинаем с создателя
-            creatorTgId: Telegram.WebApp.initDataUnsafe?.user?.id || 'testUser', // Временное сохранение Telegram ID
-            status: 'waiting' // Ожидание других игроков
-        };
-        localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData)); // Сохраняем данные батла
+                // Генерируем уникальный ID батла
+                const battleId = crypto.randomUUID().replace(/-/g, '').substring(0, 8); // Короткий уникальный ID
+                const battleData = {
+                    id: battleId,
+                    type: document.getElementById('battle-type').value,
+                    difficulty: document.getElementById('difficulty').value,
+                    gameCount: gameCountInput.value,
+                    hints: document.getElementById('hints').value,
+                    scgStake: scgStake,
+                    participants: parseInt(participantsInput.value),
+                    currentParticipants: 1, // Начинаем с создателя
+                    creatorTgId: Telegram.WebApp.initDataUnsafe?.user?.id || 'testUser', // Временное сохранение Telegram ID
+                    status: 'waiting' // Ожидание других игроков
+                };
+                localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData)); // Сохраняем данные батла
 
-        // Перенаправляем на страницу батла
-        window.location.href = `./${battleId}`;
-        modal.style.display = 'none';
-    }
-});
+                // Перенаправляем на страницу батла с параметром
+                window.location.href = `./battle.html?battleId=${battleId}`;
+                modal.style.display = 'none';
+            }
+        });
 
         document.addEventListener('click', (event) => {
             if (event.target === modal) {
                 modal.style.display = 'none';
             }
         });
+
+        // Инициализация
+        updateSCG();
+        validateForm();
     });
 </script>
 </html>
