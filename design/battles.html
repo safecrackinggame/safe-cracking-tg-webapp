@@ -6,8 +6,9 @@
     <title>Safe Cracking TG - Battles</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.googleapis.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.googleapis.com/firebasejs/9.23.0/firebase-database.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -19,7 +20,7 @@
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
-            transition: background-color 0.3s, color 0.3s;
+            transition: background-color: 0.3s, color: 0.3s;
         }
         .game-container {
             width: 100%;
@@ -27,7 +28,7 @@
             padding: 1rem;
             background-color: #ffffff;
             border-radius: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -43,200 +44,42 @@
             background-color: #2d3748;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
         }
-        /* Повторяем стили из index.html для консистентности */
         .dark-mode .text-gray-800 { color: #e2e8f0; }
-        .dark-mode .text-gray-700 { color: #cbd5e0; }
         .dark-mode .text-gray-600 { color: #a0aec0; }
-        .dark-mode .bg-gray-200 { background-color: #4a5568; }
-        .dark-mode .bg-white { background-color: #2d3748; }
-        .dark-mode .bg-gray-50 { background-color: #1f2937; }
-        .dark-mode .bg-green-500 { background-color: #059669; }
         .dark-mode .bg-blue-500 { background-color: #1e40af; }
-        .dark-mode .hover\:bg-green-600:hover { background-color: #047857; }
-        .dark-mode .hover\:bg-blue-600:hover { background-color: #1e3a8a; }
-        .dark-mode .border-gray-300 { border-color: #4a5568; }
-        .dark-mode .bg-gray-400 { background-color: #6b7280; }
-        .digit-picker {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 0.25rem;
-            border: 2px solid #cbd5e1;
-            border-radius: 0.75rem;
-            padding: 0.5rem;
-            background-color: #f8fafc;
-            width: 60px;
-            flex-shrink: 0;
-            flex-grow: 0;
-        }
-        .dark-mode .digit-picker {
-            border-color: #4a5568;
-            background-color: #1f2937;
-        }
-        .digit-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1a202c;
-            min-width: 40px;
-            text-align: center;
-            cursor: pointer;
-            padding: 0 0.25rem;
-        }
-        .dark-mode .digit-display {
-            color: #e2e8f0;
-        }
-        .digit-display.correct {
-            color: #10B981;
-            border: 2px solid #10B981;
-            background-color: #ECFDF5;
-            border-radius: 0.5rem;
-        }
-        .dark-mode .digit-display.correct {
-            background-color: #064e3b;
-        }
-        .arrow-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            width: 40px;
-            height: 30px;
-            font-size: 1.25rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 0.25rem;
-            margin-bottom: 0.25rem;
-        }
-        .arrow-button:active:not(:disabled) {
-            background-color: #357bd8;
-        }
-        .arrow-button:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .dark-mode .arrow-button {
-            background-color: #1e40af;
-        }
-        .dark-mode .arrow-button:active:not(:disabled) {
-            background-color: #1e3a8a;
-        }
-        .dark-mode .arrow-button:disabled {
-            background-color: #6b7280;
-        }
-        .hint-button {
-            background-color: #e2e8f0;
-            color: #64748b;
-            border: 1px solid #cbd5e1;
-            border-radius: 9999px;
-            width: 30px;
-            height: 30px;
-            font-size: 1rem;
-            font-weight: bold;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            margin-top: 0.5rem;
-        }
-        .hint-button:active:not(:disabled) {
-            background-color: #cbd5e1;
-            color: #4a5568;
-        }
-        .hint-button.revealed {
-            background-color: #d1fae5;
-            color: #065f46;
-            border-color: #10b981;
-            cursor: default;
-        }
-        .dark-mode .hint-button {
-            background-color: #4a5568;
-            color: #a0aec0;
-            border-color: #6b7280;
-        }
-        .dark-mode .hint-button:active:not(:disabled) {
-            background-color: #6b7280;
-            color: #e2e8f0;
-        }
-        .dark-mode .hint-button.revealed {
-            background-color: #064e3b;
-            color: #34d399;
-            border-color: #10b981;
-        }
-        .hint-button:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            max-width: 350px;
-            width: 90%;
-            text-align: center;
-            transition: background-color 0.3s;
-        }
-        .dark-mode .modal-content {
-            background-color: #2d3748;
-        }
-        .modal-button {
-            background-color: #4a90e2;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin: 0.5rem;
-        }
-        .modal-button:hover:not(:disabled) {
-            background-color: #357bd8;
-        }
-        .modal-button.cancel {
-            background-color: #ef4444;
-        }
-        .modal-button.cancel:hover:not(:disabled) {
-            background-color: #dc2626;
-        }
-        .dark-mode .modal-button {
-            background-color: #1e40af;
-        }
-        .dark-mode .modal-button:hover:not(:disabled) {
-            background-color: #1e3a8a;
-        }
-        .dark-mode .modal-button.cancel {
-            background-color: #b91c1c;
-        }
-        .dark-mode .modal-button.cancel:hover:not(:disabled) {
-            background-color: #991b1b;
-        }
-        select, input[type="number"], input[type="text"] {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #cbd5e1;
-            background-color: #f8fafc;
-            color: #333;
-            font-size: 1rem;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3e%3c/path%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-            background-size: 1.25rem;
-            cursor
+        .dark-mode .hover:bg-blue-600:hover { background-color: #1e3a8a; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные сражения</h1>
+        <p class="text-lg text-gray-600 mb-6" data-translate="battles_challenge">Вызови друга на интеллектуальный батл!</p>
+        <button id="create-battle-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors mb-6" data-translate="create-battle-btn">Создать батл</button>
+        <h2 class="text-xl font-semibold mb-4" data-translate="open_battles">Открытные батлы</h2>
+        <div id="battles-list" class="w-full"></div>
+    </div>
+</body>
+<script>
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    // Firebase configuration (замените на свои данные)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        databaseURL: "YOUR_DATABASE_URL",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_STORAGE_BUCKET",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Заглушка для JavaScript
+    const createBattleBtn = document.getElementById('create-battle-btn');
+    createBattleBtn.addEventListener('click', () => {
+        alert('Создание батла скоро будет доступно!');
+    });
+</script>
+</html>
