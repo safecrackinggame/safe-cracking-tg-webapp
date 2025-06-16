@@ -34,7 +34,7 @@
             align-items: center;
             text-align: center;
             box-sizing: border-box;
-            transition: background-color 0.3s, box-shadow 0.3s;
+            transition: background-color 0.3s, box-shadow: 0.3s;
         }
         body.dark-mode {
             background-color: #1a202c;
@@ -48,15 +48,102 @@
         .dark-mode .text-gray-600 { color: #a0aec0; }
         .dark-mode .bg-blue-500 { background-color: #1e40af; }
         .dark-mode .hover:bg-blue-600:hover { background-color: #1e3a8a; }
+        #theme-toggle, #sound-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .dark-mode #theme-icon {
+            content: url('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/moon.png');
+        }
+        .dark-mode #sound-icon {
+            content: url('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sound-off.png');
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            max-width: 90%;
+            text-align: center;
+        }
+        .dark-mode .modal-content {
+            background: #2d3748;
+        }
+        .modal-button {
+            background: #4a90e2;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            margin: 0.5rem;
+            cursor: pointer;
+        }
+        .modal-button.cancel {
+            background: #a0aec0;
+        }
+        .dark-mode .modal-button {
+            background: #1e40af;
+        }
+        .dark-mode .modal-button.cancel {
+            background: #4a5568;
+        }
+        .hidden {
+            display: none;
+        }
+        .footer-link {
+            margin-top: 1rem;
+            color: #4a90e2;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .dark-mode .footer-link {
+            color: #60a5fa;
+        }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные сражения</h1>
+        <div class="flex justify-between items-center w-full mb-4">
+            <div class="flex items-center">
+                <img src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/logo.png" alt="Logo" class="w-10 h-10 mr-2">
+                <h1 class="text-2xl font-bold text-gray-800" data-translate="app_title">Safe Cracking</h1>
+            </div>
+            <div class="flex items-center">
+                <button id="theme-toggle" class="mr-2">
+                    <img id="theme-icon" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sun.png" alt="Theme" class="w-6 h-6">
+                </button>
+                <button id="sound-toggle">
+                    <img id="sound-icon" src="https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sound-on.png" alt="Sound" class="w-6 h-6">
+                </button>
+            </div>
+        </div>
+        <h1 class="text-lg font-bold text-gray-800 mb-6" data-translate="battles_title">Интеллектуальные бытлы</h1>
         <p class="text-lg text-gray-600 mb-6" data-translate="battles_challenge">Вызови друга на интеллектуальный батл!</p>
         <button id="create-battle-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-colors mb-6" data-translate="create-battle-btn">Создать батл</button>
-        <h2 class="text-xl font-semibold mb-4" data-translate="open_battles">Открытные батлы</h2>
+        <h2 class="text-xl font-semibold mb-4" data-translate="open_battles">Открытые батлы</h2>
         <div id="battles-list" class="w-full"></div>
+        <a href="https://safecrackinggame.github.io/safe-cracking-tg-webapp/" class="footer-link" data-translate="single_player_link">Одиночная игра</a>
+        <div id="registration-modal-overlay" class="modal-overlay hidden">
+            <div class="modal-content">
+                <p class="text-xl font-semibold mb-4" data-translate="register_title">Регистрация</p>
+                <p class="text-gray-600 mb-4" data-translate="register_prompt">Введите имя для батлов:</p>
+                <input id="username-input" type="text" class="w-full p-2 mb-4 border rounded-lg" placeholder="Ваше имя" data-translate-placeholder="username_placeholder">
+                <button id="register-button" class="modal-button" data-translate="register_button">Зарегистрироваться</button>
+                <button id="register-cancel-button" class="modal-button cancel" data-translate="cancel_button">Отмена</button>
+            </div>
+        </div>
     </div>
 </body>
 <script>
@@ -76,11 +163,111 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Заглушка для JavaScript
     const createBattleBtn = document.getElementById('create-battle-btn');
-    createBattleBtn.addEventListener('click', () => {
-        alert('Создание батла скоро будет доступно!');
+    const themeToggle = document.getElementById('theme-toggle');
+    const soundToggle = document.getElementById('sound-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const soundIcon = document.getElementById('sound-icon');
+    const registrationModalOverlay = document.getElementById('registration-modal-overlay');
+    const usernameInput = document.getElementById('username-input');
+    const registerButton = document.getElementById('register-button');
+    const registerCancelButton = document.getElementById('register-cancel-button');
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+    let isSoundOn = localStorage.getItem('soundOn') !== 'false';
+    let userId = Telegram.WebApp.initDataUnsafe.user ? Telegram.WebApp.initDataUnsafe.user.id : 'test-user-' + Math.random().toString(36).substr(2, 9);
+
+    function applyTheme() {
+        if (isDarkMode) {
+            document.body.classList.add('dark-mode');
+            themeIcon.src = 'https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/moon.png';
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeIcon.src = 'https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sun.png';
+        }
+        localStorage.setItem('darkMode', isDarkMode);
+    }
+
+    function applySound() {
+        soundIcon.src = isSoundOn
+            ? 'https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sound-on.png'
+            : 'https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/sound-off.png';
+        localStorage.setItem('soundOn', isSoundOn);
+    }
+
+    themeToggle.addEventListener('click', () => {
+        isDarkMode = !isDarkMode;
+        applyTheme();
+    });
+
+    soundToggle.addEventListener('click', () => {
+        isSoundOn = !isSoundOn;
+        applySound();
+    });
+
+    applyTheme();
+    applySound();
+
+    function showMessage(message, color = 'black') {
+        const messageDiv = document.createElement('div');
+        messageDiv.textContent = message;
+        messageDiv.style.position = 'fixed';
+        messageDiv.style.top = '10px';
+        messageDiv.style.left = '50%';
+        messageDiv.style.transform = 'translateX(-50%)';
+        messageDiv.style.background = color;
+        messageDiv.style.color = 'white';
+        messageDiv.style.padding = '10px';
+        messageDiv.style.borderRadius = '5px';
+        messageDiv.style.zIndex = '1001';
+        document.body.appendChild(messageDiv);
+        setTimeout(() => messageDiv.remove(), 3000);
+    }
+
+    async function checkUser() {
+        const userRef = db.ref('users/' + userId);
+        const snapshot = await userRef.once('value');
+        return snapshot.val();
+    }
+
+    async function registerUser(username) {
+        if (!username || username.length < 3) {
+            showMessage(translate('username_too_short'), 'red');
+            return false;
+        }
+        try {
+            await db.ref('users/' + userId).set({
+                username: username,
+                telegramId: userId,
+                createdAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            showMessage(translate('registration_success'), 'green');
+            return true;
+        } catch (error) {
+            showMessage(translate('registration_failed'), 'red');
+            return false;
+        }
+    }
+
+    registerButton.addEventListener('click', async () => {
+        const username = usernameInput.value.trim();
+        if (await registerUser(username)) {
+            registrationModalOverlay.classList.add('hidden');
+            usernameInput.value = '';
+        }
+    });
+
+    registerCancelButton.addEventListener('click', () => {
+        registrationModalOverlay.classList.add('hidden');
+        usernameInput.value = '';
+    });
+
+    createBattleBtn.addEventListener('click', async () => {
+        const user = await checkUser();
+        if (!user) {
+            registrationModalOverlay.classList.remove('hidden');
+        } else {
+            alert('Создание батла скоро будет доступно!');
+        }
     });
 </script>
 </html>
-
