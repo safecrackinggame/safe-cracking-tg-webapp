@@ -1,17 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Safe Cracking - Top Template</title>
+    <title>Safe Cracking TG</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
-            transition: background-color 0.3s;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        body.dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
         }
         .top-bar {
             display: flex;
@@ -19,72 +29,74 @@
             align-items: center;
             width: 100%;
             max-width: 420px;
-            margin: 0 auto;
-            padding: 0.5rem 1rem;
-            background-color: #e6effc; /* Светлая тема по умолчанию */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
             flex-wrap: wrap;
             gap: 0.5rem;
         }
-        body.dark-mode .top-bar {
-            background-color: #1e293b; /* Тёмная тема */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        .bottom-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 420px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
         .settings-bar {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: nowrap;
         }
-        .settings-bar:nth-child(1) { justify-content: flex-start; }
-        .settings-bar:nth-child(2) { justify-content: center; flex-grow: 1; }
-        .settings-bar:nth-child(3) { justify-content: flex-end; }
+        .settings-bar:nth-child(1) {
+            justify-content: flex-start;
+        }
+        .settings-bar:nth-child(2) {
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .settings-bar:nth-child(3) {
+            justify-content: flex-end;
+        }
         .theme-toggle-btn, .sound-toggle-btn {
             padding: 0.5rem;
             border-radius: 9999px;
-            transition: background-color 0.2s, color 0.2s;
+            transition: background-color 0.2s;
             cursor: pointer;
         }
         .theme-toggle-btn:hover, .sound-toggle-btn:hover {
-            background-color: #d1e0f8; /* Светлый hover */
+            background-color: #e2e8f0;
         }
-        body.dark-mode .theme-toggle-btn:hover, body.dark-mode .sound-toggle-btn:hover {
-            background-color: #334155; /* Тёмный hover */
+        .dark-mode .theme-toggle-btn:hover, .dark-mode .sound-toggle-btn:hover {
+            background-color: #4a5568;
         }
         .theme-toggle-btn svg, .sound-toggle-btn svg {
             width: 24px;
             height: 24px;
+            color: #4a5568;
         }
-        body .theme-toggle-btn svg {
-            color: #64748b; /* Серый в светлой теме */
-        }
-        body.dark-mode .theme-toggle-btn svg {
-            color: #f59e0b; /* Оранжевый в тёмной теме */
-        }
-        body .sound-toggle-btn svg {
-            color: #64748b; /* Серый в светлой теме */
-        }
-        body.dark-mode .sound-toggle-btn svg {
-            color: #f59e0b; /* Оранжевый в тёмной теме */
+        .dark-mode .theme-toggle-btn svg, .dark-mode .sound-toggle-btn svg {
+            color: #f59e0b;
         }
         .logo-image {
             width: 32px;
             height: 32px;
         }
         h1 {
-            font-size: 1.5rem;
+            font-size: 2.25rem;
             font-weight: bold;
-            color: #1e293b; /* Тёмный текст в светлой теме */
-            margin: 0;
+            color: #1a202c;
         }
         body.dark-mode h1 {
-            color: #f1f5f9; /* Светлый текст в тёмной теме */
+            color: #e2e8f0;
         }
         select {
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             border: 1px solid #cbd5e1;
             background-color: #f8fafc;
-            color: #1e293b;
+            color: #333;
             font-size: 1rem;
             appearance: none;
             background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3e%3cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'%3e%3c/path%3e%3c/svg%3e");
@@ -95,25 +107,14 @@
             outline: none;
             min-width: 120px;
         }
-        body.dark-mode select {
+        .dark-mode select {
             border-color: #4a5568;
             background-color: #1f2937;
-            color: #f1f5f9;
+            color: #e2e8f0;
         }
         select:focus {
             border-color: #4a90e2;
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
-        }
-        .bottom-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 420px;
-            margin: 0 auto 1rem;
-            padding: 0 1rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
         }
     </style>
 </head>
