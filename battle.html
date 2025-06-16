@@ -1156,11 +1156,10 @@
             if (battleId) {
                 const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
                 if (battleData && battleData.difficulty) {
-                    currentDifficultyKey = battleData.difficulty;
+                    currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
                 }
             }
             if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
-            difficultySelector.value = currentDifficultyKey;
 
             const savedLanguage = localStorage.getItem('currentLanguage');
             const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
@@ -1682,8 +1681,17 @@
                     console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
                 }
             }
-            difficultySelector.value = currentDifficultyKey;
-            difficultySelector.disabled = true;
+            // Set the difficulty selector to the value from battleData
+            const urlParams = new URLSearchParams(window.location.search);
+            const battleId = urlParams.get('battleId');
+            if (battleId) {
+                const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+                if (battleData && battleData.difficulty) {
+                    currentDifficultyKey = battleData.difficulty.toUpperCase();
+                    difficultySelector.value = currentDifficultyKey;
+                }
+            }
+            difficultySelector.disabled = true; // Ensure it remains locked
             updateRewardRangeDisplay();
             console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
         }
@@ -1725,7 +1733,7 @@
             showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
             setTimeout(() => {
                 resetGame();
-            }, 7000); // 5000 (изображение) + 2000 (задержка)
+            }, 7000); // 5000 (изображение) + 200
         });
     </script>
 </html>
