@@ -1591,6 +1591,36 @@
         }
     });
 
+    // Отображение участников батла
+    if (battleData && battleData.participants) {
+        const participantsDisplay = document.createElement('p');
+        participantsDisplay.textContent = translate('participants_label') + ': ' + battleData.participants.map(id => `User ${id}`).join(', ');
+        participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
+        if (!document.getElementById('participants-display')) {
+            document.querySelector('.game-container').insertBefore(participantsDisplay, hintModalOverlay);
+            participantsDisplay.id = 'participants-display';
+        } else {
+            document.getElementById('participants-display').textContent = participantsDisplay.textContent;
+        }
+    }
+
+    // Отображение ссылки для приглашения
+    if (battleData && battleId) {
+        const inviteLink = `https://t.me/Safe_Cracking_bot?startapp=battle_${battleId}`;
+        const battleModeLabel = document.querySelector('.battle-mode-label');
+        if (battleModeLabel) {
+            const linkElement = document.createElement('p');
+            linkElement.innerHTML = `<a href="${inviteLink}" class="text-blue-500 underline cursor-pointer" onclick="navigator.clipboard.writeText('${inviteLink}'); alert('Ссылка скопирована!');">${translate('invite_link_label')}</a>`;
+            linkElement.className = 'text-sm text-gray-600 dark:text-gray-300 mt-2';
+            if (!document.getElementById('invite-link-display')) {
+                battleModeLabel.parentNode.insertBefore(linkElement, battleModeLabel.nextSibling);
+                linkElement.id = 'invite-link-display';
+            } else {
+                document.getElementById('invite-link-display').innerHTML = linkElement.innerHTML;
+            }
+        }
+    }
+
     updateTheme();
     updateSoundIcon();
     logoImage.classList.toggle('hidden', !isGameInProgress);
