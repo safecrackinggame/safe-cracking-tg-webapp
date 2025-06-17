@@ -1358,7 +1358,7 @@
 
             activeHintIndex = digitIndex;
 
-            modalMessage.textContent = translate('hint_cost_message', {cost: currentHintCost});
+            modalMessage.textContent = translate('hint_cost_message', { cost: currentHintCost });
             modalConfirmButton.textContent = translate('buy_button');
             modalConfirmButton.onclick = () => confirmBuyHint();
             hintModalOverlay.classList.remove('hidden');
@@ -1377,7 +1377,7 @@
 
                 gameLogic.currentGuess[activeHintIndex] = digit;
                 
-                showMessage(translate('hint_bought_success', {coinsLeft: formatLargeNumber(totalCoins)}), 'blue');
+                showMessage(translate('hint_bought_success', { coinsLeft: formatLargeNumber(totalCoins) }), 'blue');
                 currentHintCost = 0;
                 updateUI();
                 saveGameData();
@@ -1407,7 +1407,7 @@
             coinRecoveryModalOverlay.classList.remove('hidden');
             recoveryOkButton.classList.add('hidden');
 
-            recoveryModalMessage.textContent = translate('not_enough_coins_normal', {seconds: coinRecoveryCountdownSeconds});
+            recoveryModalMessage.textContent = translate('not_enough_coins_normal', { seconds: coinRecoveryCountdownSeconds });
             updateCoinRecoveryCountdown();
 
             coinRecoveryTimer = setInterval(() => {
@@ -1419,7 +1419,7 @@
                     totalCoins = recoveryAmount;
                     saveGameData();
                     updateUI();
-                    recoveryModalMessage.textContent = translate('coins_recovered_message', {amount: recoveryAmount, totalCoins: formatLargeNumber(totalCoins)});
+                    recoveryModalMessage.textContent = translate('coins_recovered_message', { amount: recoveryAmount, totalCoins: formatLargeNumber(totalCoins) });
                     recoveryCountdown.textContent = '';
                     recoveryOkButton.classList.remove('hidden');
                 }
@@ -1719,6 +1719,8 @@
         function updateRewardRangeDisplay() {
             rewardRangeDisplay.textContent = '';
         }
+
+        document.addEventListener('DOMContentLoaded', async () => {
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
