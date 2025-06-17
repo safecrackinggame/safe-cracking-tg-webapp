@@ -1159,7 +1159,7 @@
                     currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
                 }
                 // Get hints enabled status from battle data
-                const hintsEnabled = battleData && battleData.hintsEnabled !== undefined ? battleData.hintsEnabled : true;
+                const hintsEnabled = battleData && battleData.hints === 'off' ? false : true;
                 localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
             }
             if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
@@ -1726,7 +1726,7 @@
             populateLanguageSelector();
             populateDifficultySelector();
 
-            await loadTranslations(currentLanguage);
+            await loadTranslations
 
             if (totalCoins >= UNLOCK_COSTS.HARD) {
                 unlockedDifficulties.HARD = true;
