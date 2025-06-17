@@ -425,14 +425,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const scgStakeInput = document.getElementById('scg-stake');
     const scgStakeLabel = document.getElementById('scg-stake-label');
 
-    // Функция для получения и обновления количества монет
     function updateSCG() {
         let totalCoins = parseInt(localStorage.getItem('totalCoins')) || 0;
         scgStakeLabel.textContent = `Ставка SCG (Max ${totalCoins}):`;
         return totalCoins;
     }
 
-    // Обновление при изменении localStorage
     window.addEventListener('storage', () => {
         updateSCG();
         validateForm();
@@ -478,11 +476,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Временное дублирование для теста (добавляем суффикс на основе deviceId)
-            const deviceId = navigator.userAgent; // Простой способ отличить устройства
-            const participantId = `${user.id}_${deviceId.substring(0, 8)}`; // Уникальный ID для текущей сессии
-            const participants = Array.from({ length: parseInt(participantsInput.value) }, (_, i) => 
-                i === 0 ? participantId : `${user.id}_test${i}` // Дублируем ID для теста
+            const deviceId = navigator.userAgent.substring(0, 8); // Уникальный суффикс для устройства
+            const participantId = `${user.id}_${deviceId}`;
+            const participants = Array.from({ length: parseInt(participantsInput.value) }, (_, i) =>
+                i === 0 ? participantId : `${user.id}_test${i}` // Временное дублирование для теста
             );
 
             const battleData = {
@@ -502,13 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData));
             console.log("[Battle Created] Battle ID:", battleId, "Data:", battleData);
 
-            const inviteLink = `https://t.me/YourBotName?startapp=battle_${battleId}`;
-            Telegram.WebApp.showPopup({
-                title: "Батл создан",
-                message: `Пригласите друзей по ссылке: ${inviteLink}`,
-                buttons: [{ id: 'ok', type: 'ok', text: "OK" }]
-            });
-
+            // Прямой переход на battle.html
             window.location.href = `./battle.html?battleId=${battleId}`;
             modal.style.display = 'none';
         }
