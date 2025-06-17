@@ -1067,28 +1067,27 @@
         }
 
         function applyTranslations() {
-            document.querySelectorAll('[data-translate]').forEach(element => {
-                const key = element.dataset.translate;
-                let params = {};
-                try {
-                    if (element.dataset.translateParams) {
-                        params = JSON.parse(element.dataset.translateParams);
-                    }
-                } catch (e) {
-                    console.error("Error parsing data-translate-params for key:", key, e);
-                }
-                element.textContent = translate(key, params);
-            });
-            populateDifficultySelector();
-            if (!hintModalOverlay.classList.contains('hidden')) {
-                const cost = currentHintCost;
-                modalMessage.textContent = translate('hint_cost_message', { cost: cost });
-                modalConfirmButton.textContent = translate('buy_button');
+    document.querySelectorAll('[data-translate]').forEach(element => {
+        const key = element.dataset.translate;
+        let params = {};
+        try {
+            if (element.dataset.translateParams) {
+                params = JSON.parse(element.dataset.translateParams);
             }
-            if (!coinRecoveryModalOverlay.classList.contains('hidden')) {
-                recoveryOkButton.textContent = translate('ok_button');
-            }
+        } catch (e) {
+            console.error("Error parsing data-translate-params for key:", key, e);
         }
+        element.textContent = translate(key, params);
+    });
+    populateDifficultySelector();
+    if (!hintModalOverlay.classList.contains('hidden')) {
+        modalMessage.textContent = translate('hint_cost_message', { cost: currentHintCost });
+        modalConfirmButton.textContent = translate('buy_button');
+    }
+    if (!coinRecoveryModalOverlay.classList.contains('hidden')) {
+        recoveryOkButton.textContent = translate('ok_button');
+    }
+}
 
         function saveGameData() {
             localStorage.setItem('totalCoins', totalCoins);
@@ -1329,40 +1328,46 @@
         }
 
         function tryBuyHint(digitIndex) {
-            if (hintsBoughtThisGame >= 2) {
-                showMessage(translate('hint_max_limit_message'), 'red');
-                return;
-            }
+    if (hintsBoughtThisGame >= 2) {
+        showMessage(translate('hint_max_limit_message'), 'red');
+        return;
+    }
 
-            if (revealedDigits.has(digitIndex)) {
-                showMessage(translate('digit_already_revealed'), 'orange');
-                return;
-            }
-            if (lockedDigits.has(digitIndex)) {
-                showMessage(translate('digit_already_locked'), 'orange');
-                return;
-            }
+    if (revealedDigits.has(digitIndex)) {
+        showMessage(translate('digit_already_revealed'), 'orange');
+        return;
+    }
+    if (lockedDigits.has(digitIndex)) {
+        showMessage(translate('digit_already_locked'), 'orange');
+        return;
+    }
 
-            // Цена подсказки зависит от ставки батла (45% от scgStake)
-            const urlParams = new URLSearchParams(window.location.search);
-            const battleId = urlParams.get('battleId');
-            let battleData = null;
-            if (battleId) {
-                battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-            }
-            if (battleData && battleData.scgStake) {
-                currentHintCost = Math.floor(battleData.scgStake * 0.45);
-            } else {
-                currentHintCost = gameLogic.getHintCost(); // Фallback на случай, если нет данных батла
-            }
+    // Цена подсказки зависит от ставки батла (45% от scgStake)
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    let battleData = null;
+    if (battleId) {
+        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+    }
+    if (battleData && battleData.scgStake) {
+        currentHintCost = Math.floor(battleData.scgStake * 0.45);
+    } else {
+        currentHintCost = gameLogic.getHintCost(); // Fallback на случай, если нет данных батла
+    }
 
-            activeHintIndex = digitIndex;
+    activeHintIndex = digitIndex;
 
-            modalMessage.textContent = translate('hint_cost_message', {cost: currentHintCost});
-            modalConfirmButton.textContent = translate('buy_button');
-            modalConfirmButton.onclick = () => confirmBuyHint();
-            hintModalOverlay.classList.remove('hidden');
-        }
+    const hintsEnabled = battleId ? (localStorage.getItem(`battle_${battleId}_hintsEnabled`) === 'true') : true;
+    if (!hintsEnabled) {
+        showMessage(translate('hints_disabled_message'), 'orange');
+        return;
+    }
+
+    modalMessage.textContent = translate('hint_cost_message', { cost: currentHintCost });
+    modalConfirmButton.textContent = translate('buy_button');
+    modalConfirmButton.onclick = () => confirmBuyHint();
+    hintModalOverlay.classList.remove('hidden');
+}
 
         function confirmBuyHint() {
             hintModalOverlay.classList.add('hidden');
