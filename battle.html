@@ -1107,139 +1107,132 @@
         }
 
         function loadGameData() {
-            console.log("[Load] Loading game data...");
-            totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
+    console.log("[Load] Loading game data...");
+    totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
 
-            const savedStats = localStorage.getItem('stats');
-            if (savedStats) {
-                try {
-                    stats = JSON.parse(savedStats);
-                    for (const diffKey in stats) {
-                        if (stats[diffKey].bestTime === null) {
-                            stats[diffKey].bestTime = Infinity;
-                        }
-                        if (typeof stats[diffKey].gamesPlayed === 'undefined') stats[diffKey].gamesPlayed = 0;
-                        if (typeof stats[diffKey].bestTime === 'undefined') stats[diffKey].bestTime = Infinity;
-                    }
-                } catch (e) {
-                    console.error("[Load] Error parsing saved stats, resetting.", e);
-                    stats = {
-                        NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                        HARD: { gamesPlayed: 0, bestTime: Infinity },
-                        CRAZY: { gamesPlayed: 0, bestTime: Infinity }
-                    };
+    const savedStats = localStorage.getItem('stats');
+    if (savedStats) {
+        try {
+            stats = JSON.parse(savedStats);
+            for (const diffKey in stats) {
+                if (stats[diffKey].bestTime === null) {
+                    stats[diffKey].bestTime = Infinity;
                 }
-            } else {
-                console.log("[Load] No saved stats found, initializing new stats.");
-                stats = {
-                    NORMAL: { gamesPlayed: 0, bestTime: Infinity },
-                    HARD: { gamesPlayed: 0, bestTime: Infinity },
-                    CRAZY: { gamesPlayed: 0, bestTime: Infinity }
-                };
+                if (typeof stats[diffKey].gamesPlayed === 'undefined') stats[diffKey].gamesPlayed = 0;
+                if (typeof stats[diffKey].bestTime === 'undefined') stats[diffKey].bestTime = Infinity;
             }
-
-            const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
-            if (savedUnlockedDifficulties) {
-                try {
-                    unlockedDifficulties = JSON.parse(savedUnlockedDifficulties);
-                } catch (e) {
-                    console.error("[Load] Error parsing unlocked difficulties, resetting.", e);
-                    unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
-                }
-            } else {
-                unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const battleId = urlParams.get('battleId');
-            if (battleId) {
-                const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-                if (battleData && battleData.difficulty) {
-                    currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
-                }
-                // Get hints enabled status from battle data
-                const hintsEnabled = battleData && battleData.hints === 'off' ? false : true;
-                localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
-            }
-            if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
-
-            const savedLanguage = localStorage.getItem('currentLanguage');
-            const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
-            const browserLanguage = navigator.language.split('-')[0];
-
-            if (savedLanguage && supportedLanguages[savedLanguage]) {
-                currentLanguage = savedLanguage;
-            } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
-                currentLanguage = telegramLanguage;
-            } else if (browserLanguage && supportedLanguages[browserLanguage]) {
-                currentLanguage = browserLanguage;
-            } else {
-                currentLanguage = 'en';
-            }
-            languageSelector.value = currentLanguage;
-
-            isDarkMode = localStorage.getItem('isDarkMode') === 'true';
-            isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
-
-            gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-
-            console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Unlocked:", unlockedDifficulties, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
+        } catch (e) {
+            console.error("[Load] Error parsing saved stats, resetting.", e);
+            stats = {
+                NORMAL: { gamesPlayed: 0, bestTime: Infinity },
+                HARD: { gamesPlayed: 0, bestTime: Infinity },
+                CRAZY: { gamesPlayed: 0, bestTime: Infinity }
+            };
         }
+    } else {
+        console.log("[Load] No saved stats found, initializing new stats.");
+        stats = {
+            NORMAL: { gamesPlayed: 0, bestTime: Infinity },
+            HARD: { gamesPlayed: 0, bestTime: Infinity },
+            CRAZY: { gamesPlayed: 0, bestTime: Infinity }
+        };
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    if (battleId) {
+        const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+        if (battleData && battleData.difficulty) {
+            currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
+        }
+        // Get hints enabled status and stake from battle data
+        const hintsEnabled = battleData && battleData.hints === 'off' ? false : true;
+        localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
+    }
+    if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
+
+    const savedLanguage = localStorage.getItem('currentLanguage');
+    const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
+    const browserLanguage = navigator.language.split('-')[0];
+
+    if (savedLanguage && supportedLanguages[savedLanguage]) {
+        currentLanguage = savedLanguage;
+    } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
+        currentLanguage = telegramLanguage;
+    } else if (browserLanguage && supportedLanguages[browserLanguage]) {
+        currentLanguage = browserLanguage;
+    } else {
+        currentLanguage = 'en';
+    }
+    languageSelector.value = currentLanguage;
+
+    isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+    isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
+
+    gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+
+    console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
+}
 
         function resetGame() {
-            console.log("[Game Reset] Resetting game...");
-            stopTimer();
-            currentElapsedTime = 0;
-            hintsBoughtThisGame = 0;
-            revealedDigits.clear();
-            lockedDigits.clear();
-            currentHintCost = 0;
+    console.log("[Game Reset] Resetting game...");
+    stopTimer();
+    currentElapsedTime = 0;
+    hintsBoughtThisGame = 0;
+    revealedDigits.clear();
+    lockedDigits.clear();
+    currentHintCost = 0;
 
-            gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
-            createGuessInputs(gameLogic.codeLength);
+    gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
+    createGuessInputs(gameLogic.codeLength);
 
-            const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    let battleData = null;
+    if (battleId) {
+        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+    }
+    const requiredStake = battleData ? battleData.scgStake : 0;
 
-            if (isCurrentDifficultyUnlockedState) {
-                isGameInProgress = true;
-                const resetResult = gameLogic.resetGame();
-                if (resetResult.secretCode === "") {
-                    showMessage(translate('puzzle_generation_failed'), 'red');
-                    solutionDisplay.textContent = '';
-                    guessButton.disabled = true;
-                    isGameInProgress = false;
-                    console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
-                    saveGameData();
-                    updateUI();
-                    return;
-                }
-                showMessage(translate('guess_code_message', {codeLength: gameLogic.codeLength}) + ' ' + translate('attempts_left_message', {attemptsLeft: gameLogic.getAttemptsLeft()}), 'default');
-                solutionDisplay.textContent = '';
-                newGameButton.classList.add('hidden');
-
-                displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
-                startTimer();
-                Telegram.WebApp.setHeaderColor('secondary_bg_color');
-            } else {
-                isGameInProgress = false;
-                const requiredCoins = UNLOCK_COSTS[currentDifficultyKey];
-                showMessage(translate('difficulty_locked', {difficultyName: translate(Difficulty[currentDifficultyKey].displayNameKey), cost: requiredCoins}), 'red');
-                solutionDisplay.textContent = '';
-                newGameButton.classList.add('hidden');
-
-                const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-                const tempResetResult = tempGameLogic.resetGame();
-                displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-                stopTimer();
-                timerDisplay.textContent = formatTime(0);
-                Telegram.WebApp.setHeaderColor('secondary_bg_color');
-            }
-
-            updateUI();
+    if (totalCoins >= requiredStake) {
+        isGameInProgress = true;
+        const resetResult = gameLogic.resetGame();
+        if (resetResult.secretCode === "") {
+            showMessage(translate('puzzle_generation_failed'), 'red');
+            solutionDisplay.textContent = '';
+            guessButton.disabled = true;
+            isGameInProgress = false;
+            console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
             saveGameData();
-            console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+            updateUI();
+            return;
         }
+        showMessage(translate('guess_code_message', { codeLength: gameLogic.codeLength }) + ' ' + translate('attempts_left_message', { attemptsLeft: gameLogic.getAttemptsLeft() }), 'default');
+        solutionDisplay.textContent = '';
+        newGameButton.classList.add('hidden');
+
+        displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
+        startTimer();
+        Telegram.WebApp.setHeaderColor('secondary_bg_color');
+    } else {
+        isGameInProgress = false;
+        showMessage(translate('insufficient_stake_message', { requiredStake: requiredStake, totalCoins: totalCoins }), 'red');
+        solutionDisplay.textContent = '';
+        newGameButton.classList.add('hidden');
+
+        const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+        const tempResetResult = tempGameLogic.resetGame();
+        displayHints(tempResetResult.hints, tempResetResult.hintRules);
+
+        stopTimer();
+        timerDisplay.textContent = formatTime(0);
+        Telegram.WebApp.setHeaderColor('secondary_bg_color');
+    }
+
+    updateUI();
+    saveGameData();
+    console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+}
 
         function checkGuess() {
             const guessArray = Array.from(guessInputContainer.querySelectorAll('.digit-display')).map(el => el.textContent);
@@ -1545,61 +1538,63 @@
         }
 
         function updateUI() {
-            totalCoinsDisplay.textContent = formatLargeNumber(totalCoins);
-            const currentStats = stats[currentDifficultyKey];
-            gamesPlayedDisplay.textContent = currentStats.gamesPlayed;
-            bestTimeDisplay.textContent = formatTime(currentStats.bestTime);
-            updateRewardRangeDisplay();
+    totalCoinsDisplay.textContent = formatLargeNumber(totalCoins);
+    const currentStats = stats[currentDifficultyKey];
+    gamesPlayedDisplay.textContent = currentStats.gamesPlayed;
+    bestTimeDisplay.textContent = formatTime(currentStats.bestTime);
+    updateRewardRangeDisplay();
 
-            const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-            
-            newGameButton.classList.add('hidden');
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    let battleData = null;
+    if (battleId) {
+        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+    }
+    const requiredStake = battleData ? battleData.scgStake : 0;
 
-            if (!isCurrentDifficultyUnlockedState || !isGameInProgress) {
-                guessButton.disabled = true;
-                guessButton.classList.add('bg-gray-400');
-                guessButton.classList.remove('bg-green-500', 'hover:bg-green-600');
-            } else {
-                guessButton.disabled = false;
-                guessButton.classList.remove('bg-gray-400');
-                guessButton.classList.add('bg-green-500', 'hover:bg-green-600');
-            }
-            
-            const urlParams = new URLSearchParams(window.location.search);
-            const battleId = urlParams.get('battleId');
-            const hintsEnabled = battleId ? (localStorage.getItem(`battle_${battleId}_hintsEnabled`) === 'true') : true;
+    if (totalCoins >= requiredStake && isGameInProgress) {
+        guessButton.disabled = false;
+        guessButton.classList.remove('bg-gray-400');
+        guessButton.classList.add('bg-green-500', 'hover:bg-green-600');
+    } else {
+        guessButton.disabled = true;
+        guessButton.classList.add('bg-gray-400');
+        guessButton.classList.remove('bg-green-500', 'hover:bg-green-600');
+    }
 
-            guessInputContainer.querySelectorAll('.digit-picker').forEach((picker, index) => {
-                const upButton = picker.querySelector('.up-arrow');
-                const downButton = picker.querySelector('.down-arrow');
-                const hintButton = picker.querySelector('.hint-button');
-                const digitDisplay = picker.querySelector('.digit-display');
+    const hintsEnabled = battleId ? (localStorage.getItem(`battle_${battleId}_hintsEnabled`) === 'true') : true;
 
-                const isDigitLockedOrRevealed = revealedDigits.has(index) || lockedDigits.has(index);
-                
-                upButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed;
-                downButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed;
-                digitDisplay.style.cursor = (!isCurrentDifficultyUnlockedState || !isGameInProgress || isDigitLockedOrRevealed) ? 'default' : 'pointer';
+    guessInputContainer.querySelectorAll('.digit-picker').forEach((picker, index) => {
+        const upButton = picker.querySelector('.up-arrow');
+        const downButton = picker.querySelector('.down-arrow');
+        const hintButton = picker.querySelector('.hint-button');
+        const digitDisplay = picker.querySelector('.digit-display');
 
-                hintButton.disabled = !isCurrentDifficultyUnlockedState || !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed || !hintsEnabled;
-                
-                if (isDigitLockedOrRevealed) {
-                    digitDisplay.textContent = revealedDigits.has(index) ? revealedDigits.get(index) : lockedDigits.get(index);
-                    digitDisplay.classList.add('correct');
-                    hintButton.classList.add('revealed');
-                    hintButton.textContent = digitDisplay.textContent;
-                } else {
-                    digitDisplay.textContent = gameLogic.currentGuess[index];
-                    digitDisplay.classList.remove('correct');
-                    hintButton.classList.remove('revealed');
-                    hintButton.textContent = '?';
-                }
-            });
+        const isDigitLockedOrRevealed = revealedDigits.has(index) || lockedDigits.has(index);
 
-            updateTheme();
-            updateSoundIcon();
-            logoImage.classList.toggle('hidden', !isGameInProgress);
+        upButton.disabled = !isGameInProgress || isDigitLockedOrRevealed || totalCoins < requiredStake;
+        downButton.disabled = !isGameInProgress || isDigitLockedOrRevealed || totalCoins < requiredStake;
+        digitDisplay.style.cursor = (!isGameInProgress || isDigitLockedOrRevealed || totalCoins < requiredStake) ? 'default' : 'pointer';
+
+        hintButton.disabled = !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed || !hintsEnabled || totalCoins < requiredStake;
+
+        if (isDigitLockedOrRevealed) {
+            digitDisplay.textContent = revealedDigits.has(index) ? revealedDigits.get(index) : lockedDigits.get(index);
+            digitDisplay.classList.add('correct');
+            hintButton.classList.add('revealed');
+            hintButton.textContent = digitDisplay.textContent;
+        } else {
+            digitDisplay.textContent = gameLogic.currentGuess[index];
+            digitDisplay.classList.remove('correct');
+            hintButton.classList.remove('revealed');
+            hintButton.textContent = '?';
         }
+    });
+
+    updateTheme();
+    updateSoundIcon();
+    logoImage.classList.toggle('hidden', !isGameInProgress);
+}
 
         function displayHints(hints, rules) {
             console.log("[Hints] Displaying hints:", hints, rules);
