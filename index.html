@@ -406,7 +406,7 @@
 </head>
 <body>
     <script>
-        // Немедленное перенаправление при загрузке с отладкой
+        // Немедленное перенаправление при загрузке с динамическим URL
         (function() {
             console.log("[Init] Script started");
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
@@ -414,10 +414,14 @@
                 const urlParams = new URLSearchParams(window.location.search);
                 const startAppParam = urlParams.get('startapp');
                 console.log("[Params] startAppParam:", startAppParam);
+
                 if (startAppParam && startAppParam.startsWith('battle_')) {
                     const battleId = startAppParam.split('_')[1];
                     console.log("[Redirect] Detected battle parameter, redirecting to battle.html with battleId:", battleId);
-                    window.location.href = `/battle.html?battleId=${battleId}`; // Абсолютный путь
+
+                    // Динамически строим URL на основе текущего расположения
+                    const baseUrl = window.location.origin; // Например, https://yourdomain.com
+                    window.location.href = `${baseUrl}/battle.html?battleId=${battleId}`;
                 } else {
                     console.log("[Redirect] No valid battle parameter, staying on index.html");
                 }
