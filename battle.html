@@ -1726,26 +1726,32 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log("[DOM Loaded] DOM content fully loaded.");
-            loadGameData();
-            populateLanguageSelector();
-            populateDifficultySelector();
+    console.log("[DOM Loaded] DOM content fully loaded.");
+    loadGameData();
+    populateLanguageSelector();
+    populateDifficultySelector();
 
-            await loadTranslations
+    // Ожидаем завершения загрузки переводов
+    try {
+        await loadTranslations(currentLanguage);
+    } catch (error) {
+        console.error("[DOM Loaded] Failed to load translations, falling back to English:", error);
+        await loadTranslations('en'); // Фallback на случай ошибки
+    }
 
-            if (totalCoins >= UNLOCK_COSTS.HARD) {
-                unlockedDifficulties.HARD = true;
-            }
-            if (totalCoins >= UNLOCK_COSTS.CRAZY) {
-                unlockedDifficulties.CRAZY = true;
-            }
+    if (totalCoins >= UNLOCK_COSTS.HARD) {
+        unlockedDifficulties.HARD = true;
+    }
+    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
+        unlockedDifficulties.CRAZY = true;
+    }
 
-            console.log("[DOM Loaded] Starting a new game.");
-            playSound(audioOpen);
-            showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
-            setTimeout(() => {
-                resetGame();
-            }, 7000); // 5000 (изображение) + 200
-        });
+    console.log("[DOM Loaded] Starting a new game.");
+    playSound(audioOpen);
+    showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+    setTimeout(() => {
+        resetGame();
+    }, 7000); // 5000 (изображение) + 200
+});
     </script>
 </html>
