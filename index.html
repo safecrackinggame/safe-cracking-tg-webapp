@@ -1719,13 +1719,17 @@
         });
     </script>
     <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const startAppParam = urlParams.get('startapp');
-    if (startAppParam && startAppParam.startsWith('battle_')) {
-        window.location.href = `./battle.html?battleId=${startAppParam.split('_')[1]}`;
-    }
-});
+    // Немедленное перенаправление при загрузке
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const startAppParam = urlParams.get('startapp');
+        if (startAppParam && startAppParam.startsWith('battle_')) {
+            console.log("[Redirect] Detected startapp parameter, redirecting to battle.html with battleId:", startAppParam.split('_')[1]);
+            window.location.href = `./battle.html?battleId=${startAppParam.split('_')[1]}`;
+        } else {
+            console.log("[Redirect] No valid startapp parameter, staying on index.html");
+        }
+    })();
 </script>
 </body>
 </html>
