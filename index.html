@@ -7,16 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const startAppParam = urlParams.get('startapp');
-    if (startAppParam && startAppParam.startsWith('battle_')) {
-        window.location.href = `./battle.html?battleId=${startAppParam.split('_')[1]}`;
-    }
-});
-</script>
-        body {
+                body {
             font-family: 'Inter', sans-serif;
             background-color: #f0f4f8;
             color: #333;
@@ -1727,5 +1718,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 7000); // 5000 (изображение) + 2000 (задержка)
         });
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const startAppParam = urlParams.get('startapp');
+    if (startAppParam && startAppParam.startsWith('battle_')) {
+        window.location.href = `./battle.html?battleId=${startAppParam.split('_')[1]}`;
+    }
+});
+</script>
 </body>
 </html>
