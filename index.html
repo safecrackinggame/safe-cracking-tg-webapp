@@ -1158,7 +1158,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Received data:', data);
+                console.log('Init user:', data);
             })
             .catch(error => {
                 console.error('Request error:', error);
@@ -1176,7 +1176,7 @@
                 console.log('[API] GetCoins:', totalCoins);
             })
 
-            totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
+            // totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
 
             const savedStats = localStorage.getItem('stats');
             if (savedStats) {
