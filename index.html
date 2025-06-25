@@ -1130,26 +1130,36 @@
         function initUser() {
             console.log("Init user on server...");
 
-            const tg = Telegram.WebApp;
-            const initData = tg.initData;
+            const initData = Telegram.WebApp.initData;
             if (!initData) {
                 return 'Not running inside Telegram';
             }
 
-            // const url = 'https://scg.rain.dp.ua/api/user/init';
-            // fetch(url)
-            //     .then(response => {
-            //         if (!response.ok) {
-            //             throw new Error(`HTTP Error: ${response.status}`);
-            //         }
-            //         return response.json();
-            //     })
-            //     .then(data => {
-            //         console.log('Received data:', data);
-            //     })
-            //     .catch(error => {
-            //         console.error('Request error:', error);
-            //     });
+            totalCoins = localStorage.getItem('totalCoins');
+
+            const url = 'https://scg.rain.dp.ua/api/user/init';
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    initData: initData,
+                    totalCoins: totalCoins,
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+            })
+            .catch(error => {
+                console.error('Request error:', error);
+            });
 
             return '';
         }
