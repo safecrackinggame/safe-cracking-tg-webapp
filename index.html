@@ -1758,12 +1758,7 @@
             let err = await initUser();
             if (err) {
                 console.error(err);
-                // alert(err);
-                Telegram.WebApp.showPopup({
-                    title: 'ERROR',
-                    message: err,
-                    buttons: [{ id: 'ok', type: 'ok', text: 'OK' }]
-                });
+                alert(err);
                 return;
             }
             loadGameData();
