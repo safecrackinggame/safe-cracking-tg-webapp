@@ -1754,7 +1754,7 @@
             let err = initUser();
             if (err) {
                 console.error(err);
-                Telegram.WebApp.showAlert(err);
+                alert(err);
                 return;
             }
             loadGameData();
