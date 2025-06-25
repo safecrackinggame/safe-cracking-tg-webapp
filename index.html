@@ -1170,8 +1170,11 @@
         function loadGameData() {
             console.log("[Load] Loading game data...");
 
-            totalCoins = APIGetCoins(Telegram.WebApp.initData);
-            console.log('[API] GetCoins:', totalCoins);
+            APIGetCoins(Telegram.WebApp.initData)
+            .then(coins => {
+                totalCoins = coins
+                console.log('[API] GetCoins:', totalCoins);
+            })
 
             totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
 
