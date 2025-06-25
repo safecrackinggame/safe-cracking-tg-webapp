@@ -1130,20 +1130,20 @@
         function loadGameData() {
             console.log("[Load] Loading game data...");
 
-            // const url = 'https://scg.rain.dp.ua/api/user/get/coins';
-            // fetch(url)
-            //     .then(response => {
-            //         if (!response.ok) {
-            //             throw new Error(`HTTP Error: ${response.status}`);
-            //         }
-            //         return response.json();
-            //     })
-            //     .then(data => {
-            //         console.log('Данные получены:', data);
-            //     })
-            //     .catch(error => {
-            //         console.error('Не удалось выполнить запрос:', error);
-            //     });
+            const url = 'https://scg.rain.dp.ua/api/user/get/coins';
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP Error: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Данные получены:', data);
+                })
+                .catch(error => {
+                    console.error('Не удалось выполнить запрос:', error);
+                });
             totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
 
             const savedStats = localStorage.getItem('stats');
