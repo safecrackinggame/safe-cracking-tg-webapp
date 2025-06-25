@@ -1128,7 +1128,7 @@
             console.log("[Save] Game data saved.");
         }
 
-        function initUser() {
+        async function initUser() {
             // Create user on server with Local Storage data.
             // If the user exists on server, then data is ignored
             console.log("Init user on server...");
@@ -1158,7 +1158,7 @@
                 return response.json();
             })
             .then(data => {
-                console.log('Init user:', data);
+                console.log('[API] Init user:', data);
             })
             .catch(error => {
                 console.error('Request error:', error);
@@ -1770,7 +1770,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
 
-            let err = initUser();
+            let err = await initUser();
             if (err) {
                 console.error(err);
                 alert(err);
