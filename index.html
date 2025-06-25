@@ -1128,6 +1128,8 @@
         }
 
         function initUser() {
+            // Create user on server with Local Storage data.
+            // If the user exists on server, then data is ignored
             console.log("Init user on server...");
 
             const initData = Telegram.WebApp.initData;
@@ -1136,6 +1138,29 @@
             }
 
             totalCoins = localStorage.getItem('totalCoins');
+
+            const url1 = 'https://scg.rain.dp.ua/api/user/get/coins';
+            fetch(url1, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    initData: initData,
+                }),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received data:', data);
+            })
+            .catch(error => {
+                console.error('Request error:', error);
+            });
 
             const url = 'https://scg.rain.dp.ua/api/user/init';
             fetch(url, {
