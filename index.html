@@ -1127,23 +1127,36 @@
             console.log("[Save] Game data saved.");
         }
 
+        function initUser() {
+            console.log("Init user on server...");
+
+            const tg = Telegram.WebApp;
+            const initData = tg.initData;
+            if (!initData) {
+                return 'Not running inside Telegram';
+            }
+
+            // const url = 'https://scg.rain.dp.ua/api/user/init';
+            // fetch(url)
+            //     .then(response => {
+            //         if (!response.ok) {
+            //             throw new Error(`HTTP Error: ${response.status}`);
+            //         }
+            //         return response.json();
+            //     })
+            //     .then(data => {
+            //         console.log('Received data:', data);
+            //     })
+            //     .catch(error => {
+            //         console.error('Request error:', error);
+            //     });
+
+            return '';
+        }
+
         function loadGameData() {
             console.log("[Load] Loading game data...");
 
-            const url = 'https://scg.rain.dp.ua/api/user/get/coins';
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP Error: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Данные получены:', data);
-                })
-                .catch(error => {
-                    console.error('Не удалось выполнить запрос:', error);
-                });
             totalCoins = parseInt(localStorage.getItem('totalCoins') || INITIAL_COINS);
 
             const savedStats = localStorage.getItem('stats');
@@ -1737,6 +1750,13 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log("[DOM Loaded] DOM content fully loaded.");
+
+            let err = initUser();
+            if (err) {
+                console.error(err);
+                tg.showAlert(err);
+                return;
+            }
             loadGameData();
             populateLanguageSelector();
             populateDifficultySelector();
