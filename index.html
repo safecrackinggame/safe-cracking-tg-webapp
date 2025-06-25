@@ -1140,29 +1140,8 @@
 
             totalCoins = localStorage.getItem('totalCoins');
 
-            const url = 'https://scg.rain.dp.ua/api/user/init';
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    initData: initData,
-                    totalCoins: totalCoins,
-                }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('[API] Init user:', data);
-            })
-            .catch(error => {
-                console.error('Request error:', error);
-            });
+            const data = await APIGetCoins(Telegram.WebApp.initData);
+            console.log('[API] Init user:', data);
 
             return '';
         }
