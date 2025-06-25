@@ -1117,8 +1117,6 @@
                 console.log('[API] SetCoins:', data);
             })
 
-            localStorage.setItem('totalCoins', totalCoins);
-
             const serializableStats = JSON.parse(JSON.stringify(stats));
             for (const diffKey in serializableStats) {
                 if (serializableStats[diffKey].bestTime === Infinity) {
