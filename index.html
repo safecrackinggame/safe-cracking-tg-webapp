@@ -1137,23 +1137,6 @@
 
             totalCoins = localStorage.getItem('totalCoins');
 
-            const url1 = 'https://scg.rain.dp.ua/api/user/get/coins';
-            fetch(url1, {
-                method: 'GET',
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Received data:', data);
-            })
-            .catch(error => {
-                console.error('Request error:', error);
-            });
-
             const url = 'https://scg.rain.dp.ua/api/user/init';
             fetch(url, {
                 method: 'POST',
