@@ -1140,7 +1140,7 @@
 
             totalCoins = localStorage.getItem('totalCoins');
 
-            const data = await APIGetCoins(Telegram.WebApp.initData);
+            const data = await APIInitUser(Telegram.WebApp.initData, totalCoins);
             console.log('[API] Init user:', data);
 
             return '';
