@@ -1183,6 +1183,13 @@ function updateRewardRangeDisplay() {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content fully loaded.");
 
+    console.log("[DOM Loaded] Starting a new game.");
+    playSound(audioOpen);
+    showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+    setTimeout(() => {
+        resetGame();
+    }, 7000); // 5000 (изображение) + 2000 (задержка)
+
     totalCoins = await APIGetCoins(Telegram.WebApp.initData);
     console.log('[API] GetCoins:', totalCoins);
 
@@ -1204,11 +1211,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (totalCoins >= UNLOCK_COSTS.CRAZY) {
         unlockedDifficulties.CRAZY = true;
     }
-
-    console.log("[DOM Loaded] Starting a new game.");
-    playSound(audioOpen);
-    showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
-    setTimeout(() => {
-        resetGame();
-    }, 7000); // 5000 (изображение) + 200
 });
