@@ -80,6 +80,10 @@ async function APISetCoins(initData, coins) {
 
 async function APIAddCoins(initData, coins) {
     console.log('[API] APIAddCoins coins:', coins);
+    console.log('[API] APIAddCoins request:', JSON.stringify({
+                initData: initData,
+                coins: coins,
+            }));
     const url = 'https://scg.rain.dp.ua/api/user/addcoins';
 
     try {
@@ -95,7 +99,7 @@ async function APIAddCoins(initData, coins) {
         });
 
         if (!response.ok) {
-            console.log('[API] APIAddCoins error:', response.status);
+            console.error('[API] APIAddCoins error:', response.status);
             throw new Error(`HTTP Error: ${response.status}`);
         }
 
