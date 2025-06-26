@@ -550,12 +550,6 @@ async function initUser() {
 function loadGameData() {
     console.log("[Load] Loading game data...");
 
-    APIGetCoins(Telegram.WebApp.initData)
-    .then(coins => {
-        totalCoins = coins
-        console.log('[API] GetCoins:', totalCoins);
-    });
-
     const savedStats = localStorage.getItem('stats');
 
     if (savedStats) {
@@ -1152,6 +1146,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(err);
         return;
     }
+
+    totalCoins = await APIGetCoins(Telegram.WebApp.initData);
+    console.log('[API] GetCoins:', totalCoins);
+
     loadGameData();
     populateLanguageSelector();
     populateDifficultySelector();

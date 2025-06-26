@@ -507,7 +507,7 @@ function applyTranslations() {
 function saveGameData() {
     APISetCoins(Telegram.WebApp.initData, totalCoins)
     .then(data => {
-        console.log('[API] SetCoins:', data);
+        console.log('[API] SetCoins (battle saveGameData):', data);
     });
 
     const serializableStats = JSON.parse(JSON.stringify(stats));
@@ -527,12 +527,6 @@ function saveGameData() {
 
 function loadGameData() {
     console.log("[Load] Loading game data...");
-
-    APIGetCoins(Telegram.WebApp.initData)
-    .then(coins => {
-        totalCoins = coins
-        console.log('[API] GetCoins:', totalCoins);
-    });
 
     const savedStats = localStorage.getItem('stats');
 
@@ -1188,6 +1182,10 @@ function updateRewardRangeDisplay() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content fully loaded.");
+
+    totalCoins = await APIGetCoins(Telegram.WebApp.initData);
+    console.log('[API] GetCoins:', totalCoins);
+
     loadGameData();
     populateLanguageSelector();
     populateDifficultySelector();
