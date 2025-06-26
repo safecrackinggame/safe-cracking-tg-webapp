@@ -80,10 +80,6 @@ async function APISetCoins(initData, coins) {
 
 async function APIAddCoins(initData, coins) {
     console.log('[API] APIAddCoins coins:', coins);
-    console.log('[API] APIAddCoins request:', JSON.stringify({
-                initData: initData,
-                coins: coins,
-            }));
     const url = 'https://scg.rain.dp.ua/api/user/addcoins';
 
     try {
@@ -94,7 +90,7 @@ async function APIAddCoins(initData, coins) {
             },
             body: JSON.stringify({
                 initData: initData,
-                coins: coins,
+                coins: "0",
             }),
         });
 
