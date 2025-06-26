@@ -90,7 +90,7 @@ async function APIAddCoins(initData, coins) {
             },
             body: JSON.stringify({
                 initData: initData,
-                coins: "0",
+                coins: coins,
             }),
         });
 

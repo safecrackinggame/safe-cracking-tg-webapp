@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!createBtn.disabled) {
             const scgStake = parseInt(scgStakeInput.value);
 
-            APIAddCoins(Telegram.WebApp.initData, -scgStake)
+            APISetCoins(Telegram.WebApp.initData, 400)
             .then(data => {
                 console.log('[API] AddCoins:', data);
             });
