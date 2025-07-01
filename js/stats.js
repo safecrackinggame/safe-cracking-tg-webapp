@@ -13,7 +13,7 @@ function displayData(data) {
         card.innerHTML = `
             <p><strong>ID:</strong>${user.id}</p>
             <p><strong>Telegram ID:</strong>${user.telegram_id}</p>
-            <p><strong>Coins:</strong>${formattedCoins}</p>
+            <p><strong>SCG:</strong>${formattedCoins}</p>
             <p><strong>Дата создания:</strong>${createdDate}</p>
             <p><strong>Дата обновления:</strong>${updatedDate}</p>
         `;
