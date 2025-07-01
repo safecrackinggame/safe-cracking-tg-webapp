@@ -6,36 +6,60 @@
     <title>Safe Cracking TG</title>
 
     <style>
-        /* Базовые стили для таблицы */
+        /* Общие стили для страницы */
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding: 20px;
-            background-color: #f4f4f9;
-        }
-        h1 {
+            background-color: #f0f2f5;
             color: #333;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse; /* Убирает двойные рамки */
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            background-color: #fff;
+        h1 {
+            text-align: center;
+            color: #1c1e21;
+            margin-bottom: 40px;
         }
-        th, td {
-            border: 1px solid #ddd; /* Рамки для ячеек */
-            padding: 12px;         /* Отступы внутри ячеек */
-            text-align: left;      /* Выравнивание текста по левому краю */
+
+        /* Контейнер для всех карточек */
+        .user-cards-container {
+            display: flex;          /* Включаем Flexbox для расположения карточек */
+            flex-wrap: wrap;        /* Разрешаем карточкам переноситься на новую строку */
+            gap: 20px;              /* Расстояние между карточками */
+            justify-content: center;/* Центрируем карточки по горизонтали */
         }
-        thead {
-            background-color: #007bff; /* Цвет фона заголовков */
-            color: white;              /* Цвет текста заголовков */
+
+        /* Стили для отдельной карточки */
+        .user-card {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;     /* Скругленные углы */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для объема */
+            padding: 20px;
+            width: 300px;           /* Фиксированная ширина карточки */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9; /* Чередование цвета строк для читаемости */
+
+        /* Эффект при наведении на карточку */
+        .user-card:hover {
+            transform: translateY(-5px); /* Слегка приподнимаем карточку */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
-        tbody tr:hover {
-            background-color: #f1f1f1; /* Подсветка строки при наведении */
+
+        /* Стили для строк данных внутри карточки */
+        .user-card p {
+            margin: 0 0 12px 0; /* Отступы между строками */
+            line-height: 1.5;
+            font-size: 16px;
+        }
+        
+        /* Убираем нижний отступ у последнего параграфа */
+        .user-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Стиль для заголовков (ID, Coins и т.д.) */
+        .user-card strong {
+            color: #606770;
+            margin-right: 8px;
         }
     </style>
 
@@ -44,19 +68,8 @@
 <body>
     <h1>Пользователи</h1>
 
-    <table id="usersTable">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Telegram ID</th>
-                <th>Coins</th>
-                <th>Дата создания</th>
-                <th>Дата обновления</th>
-            </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-    </table>
+    <div id="userCardsContainer" class="user-cards-container">
+    </div>
 
     <script src="./js/api.js"></script>
     <script src="./js/stats.js"></script>

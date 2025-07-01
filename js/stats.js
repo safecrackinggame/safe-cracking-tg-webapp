@@ -1,22 +1,24 @@
 function displayData(data) {
-    const tableBody = document.getElementById('tableBody');
-    tableBody.innerHTML = ''; 
+    const container = document.getElementById('userCardsContainer');
+    container.innerHTML = '';
 
     data.result.forEach(user => {
-        const row = document.createElement('tr');
+        const card = document.createElement('div');
+        card.className = 'user-card';
 
         const createdDate = new Date(user.dt_created).toLocaleString('ru-RU');
         const updatedDate = new Date(user.dt_updated).toLocaleString('ru-RU');
+        const formattedCoins = user.coins.toLocaleString('ru-RU');
 
-        row.innerHTML = `
-            <td>${user.id}</td>
-            <td>${user.telegram_id}</td>
-            <td>${user.coins.toLocaleString('ru-RU')}</td>
-            <td>${createdDate}</td>
-            <td>${updatedDate}</td>
+        card.innerHTML = `
+            <p><strong>ID:</strong>${user.id}</p>
+            <p><strong>Telegram ID:</strong>${user.telegram_id}</p>
+            <p><strong>Coins:</strong>${formattedCoins}</p>
+            <p><strong>Дата создания:</strong>${createdDate}</p>
+            <p><strong>Дата обновления:</strong>${updatedDate}</p>
         `;
 
-        tableBody.appendChild(row);
+        container.appendChild(card);
     });
 }
 
