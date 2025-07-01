@@ -412,6 +412,10 @@
             console.log("[Init] Script started");
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 console.log("[Init] Telegram WebApp is available");
+
+                const startParam = Telegram.WebApp.initDataUnsafe.start_param;
+                console.log("[Params] start_param = ", startParam);
+
                 const urlParams = new URLSearchParams(window.location.search);
                 const startAppParam = urlParams.get('startapp');
                 console.log("[Params] startAppParam:", startAppParam);
