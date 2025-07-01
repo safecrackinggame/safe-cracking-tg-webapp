@@ -413,8 +413,12 @@
             if (typeof Telegram !== 'undefined' && Telegram.WebApp) {
                 console.log("[Init] Telegram WebApp is available");
 
+                const baseUrl = window.location.origin;
+
                 const startParam = Telegram.WebApp.initDataUnsafe.start_param;
-                console.log("[Params] start_param = ", startParam);
+                if (startParam && startParam === 'stats') {
+                    window.location.href = `${baseUrl}/stats.html`;
+                }
 
                 const urlParams = new URLSearchParams(window.location.search);
                 const startAppParam = urlParams.get('startapp');
@@ -424,8 +428,6 @@
                     const battleId = startAppParam.split('_')[1];
                     console.log("[Redirect] Detected battle parameter, redirecting to battle.html with battleId:", battleId);
 
-                    // Динамически строим URL на основе текущего расположения
-                    const baseUrl = window.location.origin; // Например, https://yourdomain.com
                     window.location.href = `${baseUrl}/battle.html?battleId=${battleId}`;
                 } else {
                     console.log("[Redirect] No valid battle parameter, staying on index.html");
