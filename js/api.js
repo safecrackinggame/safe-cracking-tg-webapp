@@ -128,7 +128,7 @@ async function APIStats(initData) {
         }
 
         const data = await response.json();
-        console.log('[API] Stats data');
+        console.log('[API] Stats data:', data);
 
         return data.result;
     } catch (error) {
