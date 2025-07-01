@@ -5,10 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Safe Cracking TG</title>
 
+    <style>
+        /* Базовые стили для таблицы */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse; /* Убирает двойные рамки */
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #ddd; /* Рамки для ячеек */
+            padding: 12px;         /* Отступы внутри ячеек */
+            text-align: left;      /* Выравнивание текста по левому краю */
+        }
+        thead {
+            background-color: #007bff; /* Цвет фона заголовков */
+            color: white;              /* Цвет текста заголовков */
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9; /* Чередование цвета строк для читаемости */
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1; /* Подсветка строки при наведении */
+        }
+    </style>
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    Hello
+    <h1>Пользователи</h1>
+
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Telegram ID</th>
+                <th>Coins</th>
+                <th>Дата создания</th>
+                <th>Дата обновления</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+        </tbody>
+    </table>
 
     <script src="./js/api.js"></script>
     <script src="./js/stats.js"></script>
