@@ -415,11 +415,12 @@
 
                 const baseUrl = window.location.origin;
 
+                // stats
                 const startParam = Telegram.WebApp.initDataUnsafe.start_param;
                 if (startParam && startParam === 'stats') {
-                    let u = `${baseUrl}/stats.html`;
+                    let u = 'https://safecrackinggame.github.io/safe-cracking-tg-webapp/stats.html';
                     console.log("[Init] Redirect to:", u);
-                    window.location.href = `${baseUrl}/stats.html`;
+                    window.location.href = u;
                 }
 
                 const urlParams = new URLSearchParams(window.location.search);
