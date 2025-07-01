@@ -417,6 +417,8 @@
 
                 const startParam = Telegram.WebApp.initDataUnsafe.start_param;
                 if (startParam && startParam === 'stats') {
+                    let u = `${baseUrl}/stats.html`;
+                    console.log("[Init] Redirect to:", u);
                     window.location.href = `${baseUrl}/stats.html`;
                 }
 
