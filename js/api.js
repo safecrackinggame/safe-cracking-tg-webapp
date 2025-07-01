@@ -108,8 +108,10 @@ async function APIAddCoins(initData, coins) {
 
 async function APIStats(initData) {
     const url = 'https://scg.rain.dp.ua/api/stats';
+    console.log('[API] Stats URL:', url);
 
     try {
+        console.log('[API] Stats fetch');
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -121,14 +123,16 @@ async function APIStats(initData) {
         });
 
         if (!response.ok) {
+            console.log('[API] Stats throw');
             throw new Error(`HTTP Error: ${response.status}`);
         }
 
         const data = await response.json();
+        console.log('[API] Stats data');
 
         return data.result;
     } catch (error) {
-        console.error('Request error:', error);
+        console.error('[API] Stats Request error:', error);
         return 0;
     }
 }
