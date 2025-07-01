@@ -1025,7 +1025,7 @@ function updateUI() {
 
     // Отображение ссылки для приглашения
     if (battleData && battleId) {
-        const inviteLink = `https://t.me/Safe_Cracking_bot?startapp=battle_${battleId}`;
+        const inviteLink = `https://t.me/Safe_Cracking_bot/game?startapp=battle_${battleId}`;
         const battleModeLabel = document.querySelector('.battle-mode-label');
         if (battleModeLabel) {
             const linkElement = document.createElement('p');
