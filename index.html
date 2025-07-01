@@ -414,9 +414,9 @@
                 console.log("[Init] Telegram WebApp is available");
 
                 const baseUrl = window.location.origin;
+                const startParam = Telegram.WebApp.initDataUnsafe.start_param;
 
                 // stats
-                const startParam = Telegram.WebApp.initDataUnsafe.start_param;
                 if (startParam && startParam === 'stats') {
                     let u = 'https://safecrackinggame.github.io/safe-cracking-tg-webapp/stats.html';
                     console.log("[Init] Redirect to:", u);
