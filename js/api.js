@@ -185,8 +185,7 @@ async function APIGetBattle(initData, battleId) {
         }
 
         const data = await response.json();
-
-        return data.result;
+        return data;
     } catch (error) {
         console.error('Request error:', error);
         return 0;
