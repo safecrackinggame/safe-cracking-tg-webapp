@@ -406,25 +406,20 @@
 
                 const baseUrl = window.location.origin;
                 const startParam = Telegram.WebApp.initDataUnsafe.start_param;
+                console.log("[Params] startParam:", startParam);
 
-                // stats
+                // stats page
                 if (startParam && startParam === 'stats') {
-                    let u = 'https://safecrackinggame.github.io/safe-cracking-tg-webapp/stats.html';
-                    console.log("[Init] Redirect to:", u);
-                    window.location.href = u;
+                    const statsUrl = './stats.html';
+                    console.log("[Init] Redirect to:", statsUrl);
+                    window.location.href = statsUrl;
                 }
 
-                const urlParams = new URLSearchParams(window.location.search);
-                const startAppParam = urlParams.get('startapp');
-                console.log("[Params] startAppParam:", startAppParam);
-
-                if (startAppParam && startAppParam.startsWith('battle_')) {
-                    const battleId = startAppParam.split('_')[1];
+                // battle page
+                if (startParam && startParam.startsWith('battle_')) {
+                    const battleId = startParam.split('_')[1];
                     console.log("[Redirect] Detected battle parameter, redirecting to battle.html with battleId:", battleId);
-
-                    window.location.href = `${baseUrl}/battle.html?battleId=${battleId}`;
-                } else {
-                    console.log("[Redirect] No valid battle parameter, staying on index.html");
+                    window.location.href = `./battle.html?battleId=${battleId}`;
                 }
             } else {
                 console.log("[Error] Telegram WebApp is not available");
