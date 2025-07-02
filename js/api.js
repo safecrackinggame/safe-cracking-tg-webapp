@@ -164,3 +164,31 @@ async function APICreateBattle(initData, stake, battleType, difficulty, gameCoun
         return 0;
     }
 }
+
+async function APIGetBattle(initData, battleId) {
+    const url = 'https://scg.rain.dp.ua/api/battle/get';
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                initData: initData,
+                battleId: battleId,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        return data.result;
+    } catch (error) {
+        console.error('Request error:', error);
+        return 0;
+    }
+}

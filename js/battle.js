@@ -560,7 +560,13 @@ function loadGameData() {
     const urlParams = new URLSearchParams(window.location.search);
     const battleId = urlParams.get('battleId');
     if (battleId) {
+        APIGetBattle(Telegram.WebApp.initData, battleId)
+        .then(data => {
+            console.log('[API] Get Battle:', data);
+        });
+
         const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
+
         if (battleData && battleData.difficulty) {
             currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
         }
