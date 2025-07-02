@@ -108,10 +108,8 @@ async function APIAddCoins(initData, coins) {
 
 async function APIStats(initData) {
     const url = 'https://scg.rain.dp.ua/api/stats';
-    console.log('[API] Stats URL:', url);
 
     try {
-        console.log('[API] Stats fetch');
         const response = await fetch(url, {
             method: 'POST',
             headers: {
@@ -123,16 +121,42 @@ async function APIStats(initData) {
         });
 
         if (!response.ok) {
-            console.log('[API] Stats throw');
             throw new Error(`HTTP Error: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('[API] Stats data:', data);
 
         return data;
     } catch (error) {
         console.error('[API] Stats Request error:', error);
+        return 0;
+    }
+}
+
+async function APICreateBattle(initData, stake) {
+    const url = 'https://scg.rain.dp.ua/api/battle/create';
+    console.log('[API] battle create');
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                initData: initData,
+                stake: stake,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('[API] battle create Request error:', error);
         return 0;
     }
 }
