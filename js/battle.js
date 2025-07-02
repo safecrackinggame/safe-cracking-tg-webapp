@@ -1041,6 +1041,7 @@ function updateUI() {
 
     // Отображение участников батла
     if (battleData && battleData.participants) {
+        console.log("[DEBUG] participants", battleData.participants);
         const participantsDisplay = document.createElement('p');
         participantsDisplay.innerHTML = translate('participants_label') + ":<br>" + battleData.participants.map(id => `User ${id}`).join('<br>');
         participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
