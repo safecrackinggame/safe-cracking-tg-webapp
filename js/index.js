@@ -579,6 +579,23 @@ function loadGameData() {
         };
     }
 
+    const savedLanguage = localStorage.getItem('currentLanguage');
+    const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
+    const browserLanguage = navigator.language.split('-')[0];
+    if (savedLanguage && supportedLanguages[savedLanguage]) {
+        currentLanguage = savedLanguage;
+    } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
+        currentLanguage = telegramLanguage;
+    } else if (browserLanguage && supportedLanguages[browserLanguage]) {
+        currentLanguage = browserLanguage;
+    } else {
+        currentLanguage = 'en';
+    }
+    languageSelector.value = currentLanguage;
+
+    isDarkMode = localStorage.getItem('isDarkMode') === 'true';
+    isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
+
     const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
     if (savedUnlockedDifficulties) {
         try {
@@ -598,24 +615,6 @@ function loadGameData() {
         currentDifficultyKey = 'NORMAL';
     }
     difficultySelector.value = currentDifficultyKey;
-
-    const savedLanguage = localStorage.getItem('currentLanguage');
-    const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
-    const browserLanguage = navigator.language.split('-')[0];
-
-    if (savedLanguage && supportedLanguages[savedLanguage]) {
-        currentLanguage = savedLanguage;
-    } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
-        currentLanguage = telegramLanguage;
-    } else if (browserLanguage && supportedLanguages[browserLanguage]) {
-        currentLanguage = browserLanguage;
-    } else {
-        currentLanguage = 'en';
-    }
-    languageSelector.value = currentLanguage;
-
-    isDarkMode = localStorage.getItem('isDarkMode') === 'true';
-    isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
     gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
 
@@ -1139,8 +1138,8 @@ function updateRewardRangeDisplay() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content fully loaded.");
-
     console.log("[DOM Loaded] Starting a new game.");
+
     playSound(audioOpen);
     showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
     setTimeout(() => {

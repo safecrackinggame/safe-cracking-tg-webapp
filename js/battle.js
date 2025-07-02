@@ -525,7 +525,28 @@ function saveGameData() {
     console.log("[Save] Game data saved.");
 }
 
-function loadGameData() {
+async function initUser() {
+    // Create user on server with Local Storage data.
+    // If the user exists on server, then data is ignored
+    console.log("Init user on server...");
+
+    const initData = Telegram.WebApp.initData;
+    if (!initData) {
+        return 'Not running inside Telegram';
+    }
+
+    // stats = localStorage.getItem('stats');
+
+    const data = await APIInitUser(
+        Telegram.WebApp.initData,
+        localStorage.getItem('totalCoins')
+    );
+    console.log('[API] Init user:', data);
+
+    return '';
+}
+
+async function loadBattleGameData() {
     console.log("[Load] Loading game data...");
 
     const savedStats = localStorage.getItem('stats');
@@ -557,29 +578,9 @@ function loadGameData() {
         };
     }
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const battleId = urlParams.get('battleId');
-    if (battleId) {
-        APIGetBattle(Telegram.WebApp.initData, battleId)
-        .then(data => {
-            console.log('[API] Get Battle:', data);
-        });
-
-        const battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-
-        if (battleData && battleData.difficulty) {
-            currentDifficultyKey = battleData.difficulty.toUpperCase(); // Ensure consistency with Difficulty object keys
-        }
-        // Get hints enabled status and stake from battle data
-        const hintsEnabled = battleData && battleData.hints === 'off' ? false : true;
-        localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
-    }
-    if (!Difficulty[currentDifficultyKey]) currentDifficultyKey = 'NORMAL';
-
     const savedLanguage = localStorage.getItem('currentLanguage');
     const telegramLanguage = Telegram.WebApp.initDataUnsafe?.user?.language_code;
     const browserLanguage = navigator.language.split('-')[0];
-
     if (savedLanguage && supportedLanguages[savedLanguage]) {
         currentLanguage = savedLanguage;
     } else if (telegramLanguage && supportedLanguages[telegramLanguage]) {
@@ -594,9 +595,31 @@ function loadGameData() {
     isDarkMode = localStorage.getItem('isDarkMode') === 'true';
     isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
-    gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    if (!battleId) {
+        return "[Load] Wrong Battle ID";
+    }
 
-    console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
+    const data = await APIGetBattle(Telegram.WebApp.initData, battleId);
+    console.log('[API] Get Battle:', data);
+    if (data && data.success) {
+        currentDifficultyKey = data.battle.difficulty.toUpperCase();
+        if (!Difficulty[currentDifficultyKey]) {
+            currentDifficultyKey = 'NORMAL';
+        }
+
+        const hintsEnabled = data.battle.hints === 'off' ? false : true;
+        localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
+
+        gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+
+        console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
+    } else {
+        return "[Load] Wrong Battle ID";
+    }
+
+    return '';
 }
 
 function resetGame() {
@@ -1188,28 +1211,34 @@ function updateRewardRangeDisplay() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content fully loaded.");
-
     console.log("[DOM Loaded] Starting a new game.");
+
     playSound(audioOpen);
     showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
     setTimeout(() => {
         resetGame();
     }, 7000); // 5000 (изображение) + 2000 (задержка)
 
+    let err = await initUser();
+    if (err) {
+        console.error(err);
+        alert(err);
+        return;
+    }
+
     totalCoins = await APIGetCoins(Telegram.WebApp.initData);
     console.log('[API] GetCoins:', totalCoins);
 
-    loadGameData();
+    err = await loadBattleGameData();
+    if (err) {
+        console.error(err);
+        alert(err);
+        return;
+    }
     populateLanguageSelector();
     populateDifficultySelector();
 
-    // Ожидаем завершения загрузки переводов
-    try {
-        await loadTranslations(currentLanguage);
-    } catch (error) {
-        console.error("[DOM Loaded] Failed to load translations, falling back to English:", error);
-        await loadTranslations('en'); // Fallback на случай ошибки
-    }
+    await loadTranslations(currentLanguage);
 
     if (totalCoins >= UNLOCK_COSTS.HARD) {
         unlockedDifficulties.HARD = true;
