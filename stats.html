@@ -6,7 +6,6 @@
     <title>Safe Cracking TG</title>
 
     <style>
-        /* Общие стили для страницы */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding: 20px;
@@ -19,44 +18,37 @@
             margin-bottom: 40px;
         }
 
-        /* Контейнер для всех карточек */
         .user-cards-container {
-            display: flex;          /* Включаем Flexbox для расположения карточек */
-            flex-wrap: wrap;        /* Разрешаем карточкам переноситься на новую строку */
-            gap: 20px;              /* Расстояние между карточками */
-            justify-content: center;/* Центрируем карточки по горизонтали */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
         }
 
-        /* Стили для отдельной карточки */
         .user-card {
             background-color: #ffffff;
             border: 1px solid #ddd;
-            border-radius: 8px;     /* Скругленные углы */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Тень для объема */
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 300px;           /* Фиксированная ширина карточки */
+            width: 300px;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
-        /* Эффект при наведении на карточку */
         .user-card:hover {
-            transform: translateY(-5px); /* Слегка приподнимаем карточку */
+            transform: translateY(-5px);
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
         }
 
-        /* Стили для строк данных внутри карточки */
         .user-card p {
-            margin: 0 0 12px 0; /* Отступы между строками */
+            margin: 0 0 6px 0;
             line-height: 1.5;
             font-size: 16px;
         }
-        
-        /* Убираем нижний отступ у последнего параграфа */
         .user-card p:last-child {
             margin-bottom: 0;
         }
 
-        /* Стиль для заголовков (ID, Coins и т.д.) */
         .user-card strong {
             color: #606770;
             margin-right: 8px;
