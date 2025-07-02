@@ -1048,7 +1048,7 @@ function updateUI() {
             document.querySelector('.game-container').insertBefore(participantsDisplay, hintModalOverlay);
             participantsDisplay.id = 'participants-display';
         } else {
-            document.getElementById('participants-display').textContent = participantsDisplay.textContent;
+            document.getElementById('participants-display').innerHTML = participantsDisplay.innerHTML;
         }
     }
 
