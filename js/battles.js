@@ -117,46 +117,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const scgStake = parseInt(scgStakeInput.value);
 
-        APICreateBattle(Telegram.WebApp.initData, scgStake)
+        APICreateBattle(
+            Telegram.WebApp.initData,
+            scgStake,
+            document.getElementById('battle-type').value,
+            document.getElementById('difficulty').value,
+            parseInt(gameCountInput.value),
+            document.getElementById('hints').value
+        )
         .then(data => {
             console.log('[API] battle create response:', data);
 
-            const battleId = crypto.randomUUID().replace(/-/g, '').substring(0, 8);
-            const user = Telegram.WebApp.initDataUnsafe.user;
-            if (!user || !user.id) {
-                Telegram.WebApp.showPopup({
-                    title: "Ошибка",
-                    message: "Не удалось получить ваши данные. Пожалуйста, авторизуйтесь в Telegram.",
-                    buttons: [{ id: 'ok', type: 'ok', text: "OK" }]
-                });
-                return;
+            if (data && data.success) {
+                const battleId = data.battleId;
+                const user = Telegram.WebApp.initDataUnsafe.user;
+                if (!user || !user.id) {
+                    Telegram.WebApp.showPopup({
+                        title: "Ошибка",
+                        message: "Не удалось получить ваши данные. Пожалуйста, авторизуйтесь в Telegram.",
+                        buttons: [{ id: 'ok', type: 'ok', text: "OK" }]
+                    });
+                    return;
+                }
+
+                const deviceId = navigator.userAgent.substring(0, 8); // Уникальный суффикс для устройства
+                const participantId = `${user.id}_${deviceId}`;
+                const participants = Array.from({ length: parseInt(participantsInput.value) }, (_, i) =>
+                    i === 0 ? participantId : `${user.id}_test${i}` // Временное дублирование для теста
+                );
+
+                const battleData = {
+                    id: battleId,
+                    type: document.getElementById('battle-type').value,
+                    difficulty: document.getElementById('difficulty').value,
+                    gameCount: parseInt(gameCountInput.value),
+                    hints: document.getElementById('hints').value,
+                    scgStake: scgStake,
+                    participants: participants,
+                    currentParticipants: participants.length,
+                    creatorTgId: user.id,
+                    status: 'waiting',
+                    startTime: Date.now()
+                };
+
+                localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData));
+                console.log("[Battle Created] Battle ID:", battleId, "Data:", battleData);
+
+                window.location.href = `./battle.html?battleId=${battleId}`;
+                modal.style.display = 'none';
             }
-
-            const deviceId = navigator.userAgent.substring(0, 8); // Уникальный суффикс для устройства
-            const participantId = `${user.id}_${deviceId}`;
-            const participants = Array.from({ length: parseInt(participantsInput.value) }, (_, i) =>
-                i === 0 ? participantId : `${user.id}_test${i}` // Временное дублирование для теста
-            );
-
-            const battleData = {
-                id: battleId,
-                type: document.getElementById('battle-type').value,
-                difficulty: document.getElementById('difficulty').value,
-                gameCount: parseInt(gameCountInput.value),
-                hints: document.getElementById('hints').value,
-                scgStake: scgStake,
-                participants: participants,
-                currentParticipants: participants.length,
-                creatorTgId: user.id,
-                status: 'waiting',
-                startTime: Date.now()
-            };
-
-            localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData));
-            console.log("[Battle Created] Battle ID:", battleId, "Data:", battleData);
-
-            window.location.href = `./battle.html?battleId=${battleId}`;
-            modal.style.display = 'none';
         });
     });
 

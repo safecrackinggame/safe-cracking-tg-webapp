@@ -1013,7 +1013,7 @@ function updateUI() {
     // Отображение участников батла
     if (battleData && battleData.participants) {
         const participantsDisplay = document.createElement('p');
-        participantsDisplay.textContent = translate('participants_label') + ': ' + battleData.participants.map(id => `User ${id}`).join(', ');
+        participantsDisplay.textContent = translate('participants_label') + ":<br>" + battleData.participants.map(id => `User ${id}`).join('<br>');
         participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
         if (!document.getElementById('participants-display')) {
             document.querySelector('.game-container').insertBefore(participantsDisplay, hintModalOverlay);
