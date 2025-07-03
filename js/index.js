@@ -609,7 +609,6 @@ function loadGameData() {
     } else {
         currentDifficultyKey = 'NORMAL';
     }
-    difficultySelector.value = currentDifficultyKey;
 
     gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
 
@@ -1095,22 +1094,18 @@ languageSelector.addEventListener('change', async (event) => {
 
 function populateDifficultySelector() {
     console.log("[Difficulty Selector] Populating difficulty selector...");
+
     difficultySelector.innerHTML = '';
     for (const key in Difficulty) {
-        if (Object.prototype.hasOwnProperty.call(Difficulty, key) &&
-            typeof Difficulty[key] === 'object' &&
-            Difficulty[key] !== null &&
-            Difficulty[key].displayNameKey) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = translate(Difficulty[key].displayNameKey);
-            difficultySelector.appendChild(option);
-        } else {
-            console.warn(`[Difficulty Selector] Skipping invalid difficulty key: ${key}`);
-        }
+        const option = document.createElement('option');
+        option.value = key;
+        option.textContent = translate(Difficulty[key].displayNameKey);
+        difficultySelector.appendChild(option);
     }
     difficultySelector.value = currentDifficultyKey;
+
     updateRewardRangeDisplay();
+
     console.log("[Difficulty Selector] Selector value set to:", currentDifficultyKey);
 }
 
