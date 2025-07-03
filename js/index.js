@@ -519,7 +519,6 @@ function saveGameData() {
     }
     localStorage.setItem('stats', JSON.stringify(serializableStats));
     localStorage.setItem('currentDifficultyKey', currentDifficultyKey);
-    localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
     localStorage.setItem('currentLanguage', currentLanguage);
     localStorage.setItem('isDarkMode', isDarkMode);
     localStorage.setItem('isSoundEnabled', isSoundEnabled);
@@ -974,7 +973,7 @@ function updateUI() {
     updateRewardRangeDisplay();
 
     const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-    
+
     newGameButton.classList.add('hidden');
 
     if (!isCurrentDifficultyUnlockedState || !isGameInProgress) {
@@ -1022,7 +1021,6 @@ function updateUI() {
 function displayHints(hints, rules) {
     console.log("[Hints] Displaying hints:", hints, rules);
     hintsContainer.innerHTML = `<p class="text-base font-semibold mb-2 text-gray-700 dark:text-gray-300">${translate('hints_title')}</p>`;
-    const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
 
     if (hints.length > 0) {
         hints.forEach((hint, index) => {
