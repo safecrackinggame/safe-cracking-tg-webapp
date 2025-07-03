@@ -596,16 +596,11 @@ function loadGameData() {
     isDarkMode = localStorage.getItem('isDarkMode') === 'true';
     isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
-    const savedUnlockedDifficulties = localStorage.getItem('unlockedDifficulties');
-    if (savedUnlockedDifficulties) {
-        try {
-            unlockedDifficulties = JSON.parse(savedUnlockedDifficulties);
-        } catch (e) {
-            console.error("[Load] Error parsing unlocked difficulties, resetting.", e);
-            unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
-        }
-    } else {
-        unlockedDifficulties = { NORMAL: true, HARD: false, CRAZY: false };
+    if (totalCoins >= UNLOCK_COSTS.HARD) {
+        unlockedDifficulties.HARD = true;
+    }
+    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
+        unlockedDifficulties.CRAZY = true;
     }
 
     const savedDifficultyKey = localStorage.getItem('currentDifficultyKey');
@@ -1161,11 +1156,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateDifficultySelector();
 
     await loadTranslations(currentLanguage);
-
-    if (totalCoins >= UNLOCK_COSTS.HARD) {
-        unlockedDifficulties.HARD = true;
-    }
-    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
-        unlockedDifficulties.CRAZY = true;
-    }
 });

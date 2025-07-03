@@ -494,7 +494,9 @@ function applyTranslations() {
         }
         element.textContent = translate(key, params);
     });
+
     populateDifficultySelector();
+
     if (!hintModalOverlay.classList.contains('hidden')) {
         modalMessage.textContent = translate('hint_cost_message', { cost: currentHintCost });
         modalConfirmButton.textContent = translate('buy_button');
@@ -549,8 +551,19 @@ async function initUser() {
 async function loadBattleGameData() {
     console.log("[Load] Loading game data...");
 
-    const savedStats = localStorage.getItem('stats');
+    const urlParams = new URLSearchParams(window.location.search);
+    const battleId = urlParams.get('battleId');
+    if (!battleId) {
+        return "[Load] Wrong Battle ID";
+    }
 
+    const data = await APIGetBattle(Telegram.WebApp.initData, battleId);
+    console.log('[API] Get Battle:', data);
+    if (!data || !data.success) {
+        return "[Load] Wrong Battle ID";
+    }
+
+    const savedStats = localStorage.getItem('stats');
     if (savedStats) {
         try {
             stats = JSON.parse(savedStats);
@@ -595,30 +608,25 @@ async function loadBattleGameData() {
     isDarkMode = localStorage.getItem('isDarkMode') === 'true';
     isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const battleId = urlParams.get('battleId');
-    if (!battleId) {
-        return "[Load] Wrong Battle ID";
+    if (totalCoins >= UNLOCK_COSTS.HARD) {
+        unlockedDifficulties.HARD = true;
+    }
+    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
+        unlockedDifficulties.CRAZY = true;
     }
 
-    const data = await APIGetBattle(Telegram.WebApp.initData, battleId);
-    console.log('[API] Get Battle:', data);
-    if (data && data.success) {
-        currentDifficultyKey = data.battle.difficulty.toUpperCase();
-        if (!Difficulty[currentDifficultyKey]) {
-            currentDifficultyKey = 'NORMAL';
-        }
-
-        const hintsEnabled = data.battle.hints === 'off' ? false : true;
-        localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
-
-        gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-
-        console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
-    } else {
-        return "[Load] Wrong Battle ID";
+    currentDifficultyKey = data.battle.difficulty.toUpperCase();
+    if (!Difficulty[currentDifficultyKey]) {
+        currentDifficultyKey = 'NORMAL';
     }
+    difficultySelector.value = currentDifficultyKey;
 
+    const hintsEnabled = data.battle.hints === 'off' ? false : true;
+    localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
+
+    gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+
+    console.log("[Load] Game data loaded: Total Coins:", totalCoins, "Stats:", stats, "Current Difficulty:", currentDifficultyKey, "Language:", currentLanguage, "Dark Mode:", isDarkMode, "Sound Enabled:", isSoundEnabled);
     return '';
 }
 
@@ -1240,11 +1248,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateDifficultySelector();
 
     await loadTranslations(currentLanguage);
-
-    if (totalCoins >= UNLOCK_COSTS.HARD) {
-        unlockedDifficulties.HARD = true;
-    }
-    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
-        unlockedDifficulties.CRAZY = true;
-    }
 });
