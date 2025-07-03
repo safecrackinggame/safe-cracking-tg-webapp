@@ -60,16 +60,6 @@ let coinRecoveryCountdownSeconds = 0;
 let isDarkMode = localStorage.getItem('isDarkMode') === 'true';
 let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
-let unlockedDifficulties = {
-    NORMAL: true,
-    HARD: false,
-    CRAZY: false
-};
-const UNLOCK_COSTS = {
-    HARD: 225,
-    CRAZY: 1125
-};
-
 // --- Localization Variables ---
 let translations = {};
 const supportedLanguages = {
@@ -520,7 +510,6 @@ function saveGameData() {
     }
     localStorage.setItem('stats', JSON.stringify(serializableStats));
     localStorage.setItem('currentDifficultyKey', currentDifficultyKey);
-    localStorage.setItem('unlockedDifficulties', JSON.stringify(unlockedDifficulties));
     localStorage.setItem('currentLanguage', currentLanguage);
     localStorage.setItem('isDarkMode', isDarkMode);
     localStorage.setItem('isSoundEnabled', isSoundEnabled);
@@ -611,13 +600,6 @@ async function loadBattleGameData() {
     totalCoins = await APIGetCoins(Telegram.WebApp.initData);
     console.log('[API] GetCoins:', totalCoins);
 
-    if (totalCoins >= UNLOCK_COSTS.HARD) {
-        unlockedDifficulties.HARD = true;
-    }
-    if (totalCoins >= UNLOCK_COSTS.CRAZY) {
-        unlockedDifficulties.CRAZY = true;
-    }
-
     currentDifficultyKey = data.battle.difficulty.toUpperCase();
     if (!Difficulty[currentDifficultyKey]) {
         currentDifficultyKey = 'NORMAL';
@@ -643,29 +625,6 @@ function resetGame() {
 
     gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
     createGuessInputs(gameLogic.codeLength);
-
-    const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-    if (!isCurrentDifficultyUnlockedState) {
-        console.error("[Game Reset] Selected difficulty is locked. Game not started.");
-        const requiredCoins = UNLOCK_COSTS[currentDifficultyKey];
-        showMessage(translate('difficulty_locked', {difficultyName: translate(Difficulty[currentDifficultyKey].displayNameKey), cost: requiredCoins}), 'red');
-
-        isGameInProgress = false;
-        solutionDisplay.textContent = '';
-        newGameButton.classList.add('hidden');
-
-        const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-        const tempResetResult = tempGameLogic.resetGame();
-        displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-        stopTimer();
-        timerDisplay.textContent = formatTime(0);
-        Telegram.WebApp.setHeaderColor('secondary_bg_color');
-
-        saveGameData();
-        updateUI();
-        return;
-    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const battleId = urlParams.get('battleId');
@@ -776,25 +735,6 @@ function checkGuess() {
         stats[currentDifficultyKey].gamesPlayed++;
         if (currentElapsedTime < stats[currentDifficultyKey].bestTime) {
             stats[currentDifficultyKey].bestTime = currentElapsedTime;
-        }
-
-        if (!unlockedDifficulties.HARD && totalCoins >= UNLOCK_COSTS.HARD) {
-            unlockedDifficulties.HARD = true;
-            Telegram.WebApp.showPopup({
-                title: translate('new_level_unlocked'),
-                message: translate('unlocked_level_message', {levelName: translate(Difficulty.HARD.displayNameKey)}),
-                buttons: [{ id: 'ok', type: 'ok', text: translate('hooray_button') }]
-            });
-            populateDifficultySelector();
-        }
-        if (!unlockedDifficulties.CRAZY && totalCoins >= UNLOCK_COSTS.CRAZY) {
-            unlockedDifficulties.CRAZY = true;
-            Telegram.WebApp.showPopup({
-                title: translate('new_level_unlocked'),
-                message: translate('unlocked_level_message', {levelName: translate(Difficulty.CRAZY.displayNameKey)}),
-                buttons: [{ id: 'ok', type: 'ok', text: translate('hooray_button') }]
-            });
-            populateDifficultySelector();
         }
 
         updateUI();
@@ -997,7 +937,7 @@ function createGuessInputs(length) {
         upButton.dataset.index = i;
         upButton.onclick = (e) => {
             const idx = parseInt(e.target.dataset.index);
-            if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+            if (isGameInProgress && !lockedDigits.has(idx)) {
                 playSound(audioClick);
                 let currentVal = parseInt(gameLogic.currentGuess[idx]);
                 gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
@@ -1010,7 +950,7 @@ function createGuessInputs(length) {
         digitDisplay.dataset.index = i;
         digitDisplay.onclick = (e) => {
             const idx = parseInt(e.target.dataset.index);
-            if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+            if (isGameInProgress && !lockedDigits.has(idx)) {
                 playSound(audioClick);
                 let currentVal = parseInt(gameLogic.currentGuess[idx]);
                 gameLogic.currentGuess[idx] = ((currentVal + 1) % 10).toString();
@@ -1023,7 +963,7 @@ function createGuessInputs(length) {
         downButton.dataset.index = i;
         downButton.onclick = (e) => {
             const idx = parseInt(e.target.dataset.index);
-            if (isGameInProgress && unlockedDifficulties[currentDifficultyKey] && !lockedDigits.has(idx)) {
+            if (isGameInProgress && !lockedDigits.has(idx)) {
                 playSound(audioClick);
                 let currentVal = parseInt(gameLogic.currentGuess[idx]);
                 gameLogic.currentGuess[idx] = ((currentVal - 1 + 10) % 10).toString();
@@ -1035,7 +975,7 @@ function createGuessInputs(length) {
         hintButton.textContent = '?';
         hintButton.dataset.digitIndex = i;
         hintButton.onclick = () => {
-            if (isGameInProgress && unlockedDifficulties[currentDifficultyKey]) {
+            if (isGameInProgress) {
                 tryBuyHint(i);
             }
         };
