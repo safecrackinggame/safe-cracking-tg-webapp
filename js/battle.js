@@ -59,6 +59,7 @@ let coinRecoveryTimer = null;
 let coinRecoveryCountdownSeconds = 0;
 let isDarkMode = localStorage.getItem('isDarkMode') === 'true';
 let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
+let battleData = null;
 
 // --- Localization Variables ---
 let translations = {};
@@ -518,7 +519,7 @@ function saveGameData() {
 
 async function initUser() {
     // Create user on server with Local Storage data.
-    // If the user exists on server, then data is ignored
+    // If the user exists on server, then Local Storage data is ignored
     console.log("Init user on server...");
 
     const initData = Telegram.WebApp.initData;
@@ -551,6 +552,7 @@ async function loadBattleGameData() {
     if (!data || !data.success) {
         return "[Load] Wrong Battle ID";
     }
+    battleData = data.battle;
 
     const savedStats = localStorage.getItem('stats');
     if (savedStats) {
@@ -600,13 +602,10 @@ async function loadBattleGameData() {
     totalCoins = await APIGetCoins(Telegram.WebApp.initData);
     console.log('[API] GetCoins:', totalCoins);
 
-    currentDifficultyKey = data.battle.difficulty.toUpperCase();
+    currentDifficultyKey = battleData.difficulty.toUpperCase();
     if (!Difficulty[currentDifficultyKey]) {
         currentDifficultyKey = 'NORMAL';
     }
-
-    const hintsEnabled = data.battle.hints === 'off' ? false : true;
-    localStorage.setItem(`battle_${battleId}_hintsEnabled`, hintsEnabled);
 
     gameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
 
@@ -616,6 +615,7 @@ async function loadBattleGameData() {
 
 function resetGame() {
     console.log("[Game Reset] Resetting game...");
+
     stopTimer();
     currentElapsedTime = 0;
     hintsBoughtThisGame = 0;
@@ -626,11 +626,10 @@ function resetGame() {
     gameLogic.setDifficulty(Difficulty[currentDifficultyKey]);
     createGuessInputs(gameLogic.codeLength);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const battleId = urlParams.get('battleId');
-    if (!battleId) {
-        console.error("[Game Reset] Wrong battle ID. Game not started.");
-        showMessage("Wrong battle ID", 'red');
+    const requiredStake = battleData.stake;
+    if (totalCoins < requiredStake) {
+        console.error("[Game Reset] Not enough coins. Game not started.");
+        showMessage(translate('insufficient_stake_message', { requiredStake: requiredStake, totalCoins: totalCoins }), 'red');
 
         isGameInProgress = false;
         solutionDisplay.textContent = '';
@@ -649,78 +648,30 @@ function resetGame() {
         return;
     }
 
-    APIGetBattle(Telegram.WebApp.initData, battleId)
-    .then(data => {
-        console.log('[API] Get Battle:', data);
-
-        if (!data || !data.success) {
-            console.log("[Game Reset] Wrong Battle ID");
-            showMessage("Wrong battle ID", 'red');
-
-            isGameInProgress = false;
-            solutionDisplay.textContent = '';
-            newGameButton.classList.add('hidden');
-
-            const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-            const tempResetResult = tempGameLogic.resetGame();
-            displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-            stopTimer();
-            timerDisplay.textContent = formatTime(0);
-            Telegram.WebApp.setHeaderColor('secondary_bg_color');
-
-            saveGameData();
-            updateUI();
-            return;
-        }
-
-        const requiredStake = data.battle.stake;
-        if (totalCoins < requiredStake) {
-            console.error("[Game Reset] Not enough coins. Game not started.");
-            showMessage(translate('insufficient_stake_message', { requiredStake: requiredStake, totalCoins: totalCoins }), 'red');
-
-            isGameInProgress = false;
-            solutionDisplay.textContent = '';
-            newGameButton.classList.add('hidden');
-
-            const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
-            const tempResetResult = tempGameLogic.resetGame();
-            displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-            stopTimer();
-            timerDisplay.textContent = formatTime(0);
-            Telegram.WebApp.setHeaderColor('secondary_bg_color');
-
-            saveGameData();
-            updateUI();
-            return;
-        }
-
-        isGameInProgress = true;
-        const resetResult = gameLogic.resetGame();
-        if (resetResult.secretCode === "") {
-            showMessage(translate('puzzle_generation_failed'), 'red');
-            solutionDisplay.textContent = '';
-            guessButton.disabled = true;
-            isGameInProgress = false;
-            console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
-            saveGameData();
-            updateUI();
-            return;
-        }
-
-        showMessage(translate('guess_code_message', { codeLength: gameLogic.codeLength }) + ' ' + translate('attempts_left_message', { attemptsLeft: gameLogic.getAttemptsLeft() }), 'default');
+    isGameInProgress = true;
+    const resetResult = gameLogic.resetGame();
+    if (resetResult.secretCode === "") {
+        showMessage(translate('puzzle_generation_failed'), 'red');
         solutionDisplay.textContent = '';
-        newGameButton.classList.add('hidden');
-
-        displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
-        startTimer();
-        Telegram.WebApp.setHeaderColor('secondary_bg_color');
-
-        console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+        guessButton.disabled = true;
+        isGameInProgress = false;
+        console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
         saveGameData();
         updateUI();
-    });
+        return;
+    }
+
+    showMessage(translate('guess_code_message', { codeLength: gameLogic.codeLength }) + ' ' + translate('attempts_left_message', { attemptsLeft: gameLogic.getAttemptsLeft() }), 'default');
+    solutionDisplay.textContent = '';
+    newGameButton.classList.add('hidden');
+
+    displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
+    startTimer();
+    Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+    console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+    saveGameData();
+    updateUI();
 }
 
 function checkGuess() {
@@ -806,21 +757,10 @@ function tryBuyHint(digitIndex) {
     }
 
     // Цена подсказки зависит от ставки батла (45% от scgStake)
-    const urlParams = new URLSearchParams(window.location.search);
-    const battleId = urlParams.get('battleId');
-    let battleData = null;
-    if (battleId) {
-        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-    }
-    if (battleData && battleData.scgStake) {
-        currentHintCost = Math.floor(battleData.scgStake * 0.45);
-    } else {
-        currentHintCost = gameLogic.getHintCost(); // Fallback на случай, если нет данных батла
-    }
-
+    currentHintCost = Math.floor(battleData.stake * 0.45);
     activeHintIndex = digitIndex;
 
-    const hintsEnabled = battleId ? (localStorage.getItem(`battle_${battleId}_hintsEnabled`) === 'true') : true;
+    const hintsEnabled = battleData.hints === 'off' ? false : true;
     if (!hintsEnabled) {
         showMessage(translate('hints_disabled_message'), 'orange');
         return;
@@ -1014,13 +954,8 @@ function updateUI() {
     bestTimeDisplay.textContent = formatTime(currentStats.bestTime);
     updateRewardRangeDisplay();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const battleId = urlParams.get('battleId');
-    let battleData = null;
-    if (battleId) {
-        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-    }
-    const requiredStake = battleData ? battleData.scgStake : 0;
+    const battleId = battleData.uid;
+    const requiredStake = battleData.stake;
 
     if (totalCoins >= requiredStake && isGameInProgress) {
         guessButton.disabled = false;
@@ -1031,8 +966,6 @@ function updateUI() {
         guessButton.classList.add('bg-gray-400');
         guessButton.classList.remove('bg-green-500', 'hover:bg-green-600');
     }
-
-    const hintsEnabled = battleId ? (localStorage.getItem(`battle_${battleId}_hintsEnabled`) === 'true') : true;
 
     guessInputContainer.querySelectorAll('.digit-picker').forEach((picker, index) => {
         const upButton = picker.querySelector('.up-arrow');
@@ -1046,6 +979,7 @@ function updateUI() {
         downButton.disabled = !isGameInProgress || isDigitLockedOrRevealed || totalCoins < requiredStake;
         digitDisplay.style.cursor = (!isGameInProgress || isDigitLockedOrRevealed || totalCoins < requiredStake) ? 'default' : 'pointer';
 
+        const hintsEnabled = battleData.hints === 'off' ? false : true;
         hintButton.disabled = !isGameInProgress || hintsBoughtThisGame >= 2 || isDigitLockedOrRevealed || !hintsEnabled || totalCoins < requiredStake;
 
         if (isDigitLockedOrRevealed) {
@@ -1062,7 +996,7 @@ function updateUI() {
     });
 
     // Отображение участников батла
-    if (battleData && battleData.participants) {
+    if (battleData.participants) {
         console.log("[DEBUG] participants", battleData.participants);
         const participantsDisplay = document.createElement('p');
         participantsDisplay.innerHTML = translate('participants_label') + ":<br>" + battleData.participants.map(id => `User ${id}`).join('<br>');
@@ -1076,19 +1010,17 @@ function updateUI() {
     }
 
     // Отображение ссылки для приглашения
-    if (battleData && battleId) {
-        const inviteLink = `https://t.me/Safe_Cracking_bot/game?startapp=battle_${battleId}`;
-        const battleModeLabel = document.querySelector('.battle-mode-label');
-        if (battleModeLabel) {
-            const linkElement = document.createElement('p');
-            linkElement.innerHTML = `<span id="invite-link-text" class="text-blue-500 underline cursor-pointer" onclick="copyInviteLink('${inviteLink}')">${translate('invite_link_label')}</span>`;
-            linkElement.className = 'text-sm text-gray-600 dark:text-gray-300 mt-2';
-            if (!document.getElementById('invite-link-display')) {
-                battleModeLabel.parentNode.insertBefore(linkElement, battleModeLabel.nextSibling);
-                linkElement.id = 'invite-link-display';
-            } else {
-                document.getElementById('invite-link-display').innerHTML = linkElement.innerHTML;
-            }
+    const inviteLink = `https://t.me/Safe_Cracking_bot/game?startapp=battle_${battleId}`;
+    const battleModeLabel = document.querySelector('.battle-mode-label');
+    if (battleModeLabel) {
+        const linkElement = document.createElement('p');
+        linkElement.innerHTML = `<span id="invite-link-text" class="text-blue-500 underline cursor-pointer" onclick="copyInviteLink('${inviteLink}')">${translate('invite_link_label')}</span>`;
+        linkElement.className = 'text-sm text-gray-600 dark:text-gray-300 mt-2';
+        if (!document.getElementById('invite-link-display')) {
+            battleModeLabel.parentNode.insertBefore(linkElement, battleModeLabel.nextSibling);
+            linkElement.id = 'invite-link-display';
+        } else {
+            document.getElementById('invite-link-display').innerHTML = linkElement.innerHTML;
         }
     }
 

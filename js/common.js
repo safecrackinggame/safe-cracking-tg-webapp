@@ -82,8 +82,10 @@ function formatLargeNumber(num) {
     return num.toString();
 }
 
-const themeToggleBtn = document.getElementById('theme-toggle-btn');
-if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
+document.addEventListener('DOMContentLoaded', () => {
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    if (themeToggleBtn) themeToggleBtn.addEventListener('click', toggleTheme);
 
-const soundToggleBtn = document.getElementById('sound-toggle-btn');
-if (soundToggleBtn) soundToggleBtn.addEventListener('click', toggleSound);
+    const soundToggleBtn = document.getElementById('sound-toggle-btn');
+    if (soundToggleBtn) soundToggleBtn.addEventListener('click', toggleSound);
+});
