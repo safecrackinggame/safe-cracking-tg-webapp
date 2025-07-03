@@ -547,7 +547,7 @@ async function initUser() {
     return '';
 }
 
-function loadGameData() {
+async function loadGameData() {
     console.log("[Load] Loading game data...");
 
     const savedStats = localStorage.getItem('stats');
@@ -596,6 +596,9 @@ function loadGameData() {
     isDarkMode = localStorage.getItem('isDarkMode') === 'true';
     isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 
+    totalCoins = await APIGetCoins(Telegram.WebApp.initData);
+    console.log('[API] GetCoins:', totalCoins);
+
     if (totalCoins >= UNLOCK_COSTS.HARD) {
         unlockedDifficulties.HARD = true;
     }
@@ -628,7 +631,6 @@ function resetGame() {
     createGuessInputs(gameLogic.codeLength);
 
     const isCurrentDifficultyUnlockedState = unlockedDifficulties[currentDifficultyKey];
-
     if (isCurrentDifficultyUnlockedState) {
         isGameInProgress = true;
         const resetResult = gameLogic.resetGame();
@@ -650,9 +652,11 @@ function resetGame() {
         startTimer();
         Telegram.WebApp.setHeaderColor('secondary_bg_color');
     } else {
-        isGameInProgress = false;
+        console.error("[Game Reset] Selected difficulty is locked. Game not started.");
         const requiredCoins = UNLOCK_COSTS[currentDifficultyKey];
         showMessage(translate('difficulty_locked', {difficultyName: translate(Difficulty[currentDifficultyKey].displayNameKey), cost: requiredCoins}), 'red');
+
+        isGameInProgress = false;
         solutionDisplay.textContent = '';
         newGameButton.classList.add('hidden');
 
@@ -663,10 +667,14 @@ function resetGame() {
         stopTimer();
         timerDisplay.textContent = formatTime(0);
         Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+        saveGameData();
+        updateUI();
+        return;
     }
 
-    updateUI();
     saveGameData();
+    updateUI();
     console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
 }
 
@@ -1127,11 +1135,10 @@ function updateRewardRangeDisplay() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log("[DOM Loaded] DOM content fully loaded.");
-    console.log("[DOM Loaded] Starting a new game.");
+    console.log("[DOM Loaded] DOM content loaded. Starting a new game.");
 
     playSound(audioOpen);
-    showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/start.webp', 5000);
+    showImageWithDelay('./design/assets/start.webp', 5000);
     setTimeout(() => {
         resetGame();
     }, 7000); // 5000 (изображение) + 2000 (задержка)
@@ -1143,10 +1150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    totalCoins = await APIGetCoins(Telegram.WebApp.initData);
-    console.log('[API] GetCoins:', totalCoins);
-
-    loadGameData();
+    await loadGameData();
     populateLanguageSelector();
     populateDifficultySelector();
 
