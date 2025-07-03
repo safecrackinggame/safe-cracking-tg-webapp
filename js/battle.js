@@ -996,6 +996,14 @@ function updateUI() {
     });
 
     // Отображение участников батла
+    const userInfo = Telegram.WebApp.initDataUnsafe.user;
+    let username = null;
+    if (userInfo.username) {
+        username = userInfo.username;
+    } else {
+        username = userInfo.first_name;
+    }
+    battleData.participants = [username];
     if (battleData.participants) {
         console.log("[DEBUG] participants", battleData.participants);
         const participantsDisplay = document.createElement('p');
