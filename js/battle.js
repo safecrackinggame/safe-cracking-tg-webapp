@@ -1007,7 +1007,7 @@ function updateUI() {
     if (battleData.participants) {
         console.log("[DEBUG] participants", battleData.participants);
         const participantsDisplay = document.createElement('p');
-        participantsDisplay.innerHTML = translate('participants_label') + ":<br>" + battleData.participants.map(id => `User ${id}`).join('<br>');
+        participantsDisplay.innerHTML = translate('participants_label') + ":<br>" + battleData.participants.map(username => `${username}`).join('<br>');
         participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
         if (!document.getElementById('participants-display')) {
             document.querySelector('.game-container').insertBefore(participantsDisplay, hintModalOverlay);
