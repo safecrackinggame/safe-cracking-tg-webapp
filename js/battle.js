@@ -669,35 +669,9 @@ function resetGame() {
 
     const urlParams = new URLSearchParams(window.location.search);
     const battleId = urlParams.get('battleId');
-    let battleData = null;
-    if (battleId) {
-        battleData = JSON.parse(localStorage.getItem(`battle_${battleId}`));
-    }
-    const requiredStake = battleData ? battleData.scgStake : 0;
-
-    if (totalCoins >= requiredStake) {
-        isGameInProgress = true;
-        const resetResult = gameLogic.resetGame();
-        if (resetResult.secretCode === "") {
-            showMessage(translate('puzzle_generation_failed'), 'red');
-            solutionDisplay.textContent = '';
-            guessButton.disabled = true;
-            isGameInProgress = false;
-            console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
-            saveGameData();
-            updateUI();
-            return;
-        }
-        showMessage(translate('guess_code_message', { codeLength: gameLogic.codeLength }) + ' ' + translate('attempts_left_message', { attemptsLeft: gameLogic.getAttemptsLeft() }), 'default');
-        solutionDisplay.textContent = '';
-        newGameButton.classList.add('hidden');
-
-        displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
-        startTimer();
-        Telegram.WebApp.setHeaderColor('secondary_bg_color');
-    } else {
-        console.error("[Game Reset] Not enough coins. Game not started.");
-        showMessage(translate('insufficient_stake_message', { requiredStake: requiredStake, totalCoins: totalCoins }), 'red');
+    if (!battleId) {
+        console.error("[Game Reset] Wrong battle ID. Game not started.");
+        showMessage("Wrong battle ID", 'red');
 
         isGameInProgress = false;
         solutionDisplay.textContent = '';
@@ -716,9 +690,78 @@ function resetGame() {
         return;
     }
 
-    console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
-    saveGameData();
-    updateUI();
+    APIGetBattle(Telegram.WebApp.initData, battleId)
+    .then(data => {
+        console.log('[API] Get Battle:', data);
+
+        if (!data || !data.success) {
+            console.log("[Game Reset] Wrong Battle ID");
+            showMessage("Wrong battle ID", 'red');
+
+            isGameInProgress = false;
+            solutionDisplay.textContent = '';
+            newGameButton.classList.add('hidden');
+
+            const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+            const tempResetResult = tempGameLogic.resetGame();
+            displayHints(tempResetResult.hints, tempResetResult.hintRules);
+
+            stopTimer();
+            timerDisplay.textContent = formatTime(0);
+            Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+            saveGameData();
+            updateUI();
+            return;
+        }
+
+        const requiredStake = data.battle.stake;
+        if (totalCoins < requiredStake) {
+            console.error("[Game Reset] Not enough coins. Game not started.");
+            showMessage(translate('insufficient_stake_message', { requiredStake: requiredStake, totalCoins: totalCoins }), 'red');
+
+            isGameInProgress = false;
+            solutionDisplay.textContent = '';
+            newGameButton.classList.add('hidden');
+
+            const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
+            const tempResetResult = tempGameLogic.resetGame();
+            displayHints(tempResetResult.hints, tempResetResult.hintRules);
+
+            stopTimer();
+            timerDisplay.textContent = formatTime(0);
+            Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+            saveGameData();
+            updateUI();
+            return;
+        }
+
+        isGameInProgress = true;
+        const resetResult = gameLogic.resetGame();
+        if (resetResult.secretCode === "") {
+            showMessage(translate('puzzle_generation_failed'), 'red');
+            solutionDisplay.textContent = '';
+            guessButton.disabled = true;
+            isGameInProgress = false;
+            console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
+            saveGameData();
+            updateUI();
+            return;
+        }
+
+        showMessage(translate('guess_code_message', { codeLength: gameLogic.codeLength }) + ' ' + translate('attempts_left_message', { attemptsLeft: gameLogic.getAttemptsLeft() }), 'default');
+        solutionDisplay.textContent = '';
+        newGameButton.classList.add('hidden');
+
+        displayHints(gameLogic.currentHints, gameLogic.currentHintRules);
+        startTimer();
+        Telegram.WebApp.setHeaderColor('secondary_bg_color');
+
+        console.log("[Game Reset] Game reset complete. New secret code:", gameLogic.getSecretCode());
+        saveGameData();
+        updateUI();
+    });
 }
 
 function checkGuess() {
