@@ -758,11 +758,15 @@ function stopTimer() {
 }
 
 function showImageWithDelay(src, duration) {
-    gameImage.src = src;
-    imageOverlay.classList.remove('hidden');
-    setTimeout(() => {
-        imageOverlay.classList.add('hidden');
-    }, duration + 2000); // Добавляем 2 секунды задержки
+    return new Promise(resolve => {
+        gameImage.src = src;
+        imageOverlay.classList.remove('hidden');
+
+        setTimeout(() => {
+            imageOverlay.classList.add('hidden');
+            resolve(); 
+        }, duration);
+    });
 }
 
 function showImage(src, duration) {
@@ -893,10 +897,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content loaded. Starting a new game.");
 
     playSound(audioOpen);
-    showImageWithDelay('./design/assets/start.webp', 5000);
-    setTimeout(() => {
-        resetGame();
-    }, 7000); // 5000 (изображение) + 2000 (задержка)
+    showImageWithDelay('./design/assets/start.webp', 5000)
+        .then(() => {
+            resetGame();
+            initSocket();
+        });
 
     let err = await initUser();
     if (err) {
@@ -915,6 +920,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateDifficultySelector();
 
     await loadTranslations(currentLanguage);
-
-    initSocket();
 });
