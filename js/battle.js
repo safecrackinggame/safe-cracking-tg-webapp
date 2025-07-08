@@ -329,15 +329,15 @@ function resetGame() {
 
         isGameInProgress = false;
         solutionDisplay.textContent = '';
+        guessButton.disabled = true;
         newGameButton.classList.add('hidden');
+        stopTimer();
+        timerDisplay.textContent = formatTime(0);
+        Telegram.WebApp.setHeaderColor('secondary_bg_color');
 
         const tempGameLogic = new GameLogic(Difficulty[currentDifficultyKey]);
         const tempResetResult = tempGameLogic.resetGame();
         displayHints(tempResetResult.hints, tempResetResult.hintRules);
-
-        stopTimer();
-        timerDisplay.textContent = formatTime(0);
-        Telegram.WebApp.setHeaderColor('secondary_bg_color');
 
         saveGameData();
         updateUI();
@@ -348,9 +348,11 @@ function resetGame() {
     const resetResult = gameLogic.resetGame();
     if (resetResult.secretCode === "") {
         showMessage(translate('puzzle_generation_failed'), 'red');
+
+        isGameInProgress = false;
         solutionDisplay.textContent = '';
         guessButton.disabled = true;
-        isGameInProgress = false;
+
         console.error("[Game Reset] Failed to generate unique puzzle. Game not started.");
         saveGameData();
         updateUI();
@@ -375,8 +377,11 @@ function checkGuess() {
     const guessResult = gameLogic.makeGuess(guessArray);
 
     if (guessResult.isWin) {
-        stopTimer();
         isGameInProgress = false;
+        solutionDisplay.textContent = '';
+        guessButton.disabled = true;
+        stopTimer();
+
         const earnedCoins = guessResult.reward;
         totalCoins += earnedCoins;
         stats[currentDifficultyKey].gamesPlayed++;
@@ -389,21 +394,22 @@ function checkGuess() {
 
         playSound(currentDifficultyKey === 'NORMAL' ? audioOpenNormal : currentDifficultyKey === 'HARD' ? audioOpenHard : audioOpenCrazy);
         showMessage(translate('safe_cracked_win', {earnedCoins: earnedCoins}), 'green');
+
+        newGameButton.classList.remove('hidden');
+        showImageWithDelay(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 2000)
+            .then(() => {
+                Telegram.WebApp.showPopup({
+                    title: translate('victory_title'),
+                    message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
+                    buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
+                });
+                Telegram.WebApp.setHeaderColor('accent_text_color');
+            });
+    } else if (guessResult.isGameOver) {
+        isGameInProgress = false;
+        stopTimer();
         solutionDisplay.textContent = '';
         guessButton.disabled = true;
-        newGameButton.classList.remove('hidden');
-        showImageWithDelay(`https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/open${currentDifficultyKey === 'NORMAL' ? '1' : currentDifficultyKey === 'HARD' ? '' : '2'}.webp`, 2000);
-        setTimeout(() => {
-            Telegram.WebApp.showPopup({
-                title: translate('victory_title'),
-                message: `${translate('safe_cracked_win', {earnedCoins: earnedCoins})}\n${translate('your_time')}: ${formatTime(currentElapsedTime)}\n${translate('best_time')}: ${formatTime(stats[currentDifficultyKey].bestTime)}`,
-                buttons: [{ id: 'ok', type: 'ok', text: translate('great_button') }]
-            });
-            Telegram.WebApp.setHeaderColor('accent_text_color');
-        }, 2000);
-    } else if (guessResult.isGameOver) {
-        stopTimer();
-        isGameInProgress = false;
 
         stats[currentDifficultyKey].gamesPlayed++;
         updateUI();
@@ -411,8 +417,7 @@ function checkGuess() {
 
         playSound(audioAlarm);
         showMessage(translate('game_over_message', {secretCode: gameLogic.getSecretCode()}), 'red');
-        solutionDisplay.textContent = '';
-        guessButton.disabled = true;
+
         newGameButton.classList.remove('hidden');
         showImageWithDelay('https://github.com/safecrackinggame/safe-cracking-tg-webapp/raw/main/design/assets/alarm.webp', 2000);
         setTimeout(() => {
@@ -871,7 +876,9 @@ function initSocket() {
         const participantsCount = battleData.participants_count;
         if (usersCount == participantsCount) {
             console.log('All users joined');
-            resetGame();
+            stopGame();
+            countdown();
+            // resetGame();
         }
     });
 
@@ -891,6 +898,17 @@ function updateUsersList() {
 
     const participantsDisplay = document.getElementById('participants-display');
     participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
+}
+
+function countdown() {
+    console.log('countdown');
+}
+
+function stopGame() {
+    isGameInProgress = false;
+    stopTimer();
+    solutionDisplay.textContent = '';
+    guessButton.disabled = true;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -916,8 +934,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert(err);
         return;
     }
+
     populateLanguageSelector();
     populateDifficultySelector();
-
     await loadTranslations(currentLanguage);
 });
