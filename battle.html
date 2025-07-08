@@ -397,6 +397,9 @@
             font-weight: bold;
             width: 100%;
         }
+        .dark-mode #battle_users_connected {
+            background-color: #4a5568;
+        }
     </style>
 </head>
 <body>
@@ -450,7 +453,7 @@
             <div class="text-right"><span data-translate="best">Лучшее:</span> <span id="best-time-display" class="font-semibold text-gray-700">00:00</span></div>
         </div>
 
-        <div id="battle_users_connected"></div>
+        <div id="battle_users_connected" class="text-gray-700 dark:text-gray-300"></div>
 
         <div class="text-md italic mb-6 text-gray-600" id="message-display" data-translate="guess_code_message" data-translate-params='{"codeLength":3}'>Угадайте 3-значный код!</div>
 
