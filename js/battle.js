@@ -1156,10 +1156,10 @@ function initSocket() {
     socket.on('connect', () => {
         console.log('[Socket] Connected to server. ID:', socket.id);
 
-        // socket.emit('user_joined', {
-        //     username: username,
-        //     battle_id: battle_id
-        // });
+        socket.emit('user_joined', {
+            initData: Telegram.WebApp.initData,
+            battle_id: battleData.uid
+        });
     });
 
     socket.on('disconnect', () => {
