@@ -1164,7 +1164,7 @@ function initSocket() {
 
         const newSid = data.new_sid
 
-        battleData.participants = data.users;
+        battleData.participants = new Map(Object.entries(data.users));
         updateUsersList();
     });
 
