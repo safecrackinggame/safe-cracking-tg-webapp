@@ -1167,6 +1167,7 @@ function initSocket() {
         battleData.participants = new Map(Object.entries(data.users));
         updateUsersList();
 
+        const users = [...battleData.participants.values()];
         const connectedUsersDiv = document.getElementById('battle_users_connected');
         connectedUsersDiv.innerHTML = 'Присоединились 2/5:<br>' + users.map(username => `${username}`).join('<br>');
     });
