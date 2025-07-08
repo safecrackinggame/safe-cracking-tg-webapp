@@ -123,7 +123,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('battle-type').value,
             document.getElementById('difficulty').value,
             parseInt(gameCountInput.value),
-            document.getElementById('hints').value
+            document.getElementById('hints').value,
+            parseInt(participantsInput.value)
         )
         .then(data => {
             console.log('[API] battle create response:', data);
@@ -140,31 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                const deviceId = navigator.userAgent.substring(0, 8); // Уникальный суффикс для устройства
-                const participantId = `${user.id}_${deviceId}`;
-                const participants = Array.from({ length: parseInt(participantsInput.value) }, (_, i) =>
-                    i === 0 ? participantId : `${user.id}_test${i}` // Временное дублирование для теста
-                );
-
-                const battleData = {
-                    id: battleId,
-                    type: document.getElementById('battle-type').value,
-                    difficulty: document.getElementById('difficulty').value,
-                    gameCount: parseInt(gameCountInput.value),
-                    hints: document.getElementById('hints').value,
-                    scgStake: scgStake,
-                    participants: participants,
-                    currentParticipants: participants.length,
-                    creatorTgId: user.id,
-                    status: 'waiting',
-                    startTime: Date.now()
-                };
-
-                localStorage.setItem(`battle_${battleId}`, JSON.stringify(battleData));
-                console.log("[Battle Created] Battle ID:", battleId, "Data:", battleData);
-
-                window.location.href = `./battle.html?battleId=${battleId}`;
+                console.log("[Battle Created] Battle ID:", battleId);
                 modal.style.display = 'none';
+                window.location.href = `./battle.html?battleId=${battleId}`;
             }
         });
     });

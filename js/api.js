@@ -133,7 +133,7 @@ async function APIStats(initData) {
     }
 }
 
-async function APICreateBattle(initData, stake, battleType, difficulty, gameCount, hints) {
+async function APICreateBattle(initData, stake, battleType, difficulty, gameCount, hints, participantsCount) {
     const url = 'https://scg.rain.dp.ua/api/battle/create';
     console.log('[API] battle create');
 
@@ -150,6 +150,7 @@ async function APICreateBattle(initData, stake, battleType, difficulty, gameCoun
                 difficulty: difficulty,
                 gameCount: gameCount,
                 hints: hints,
+                participantsCount: participantsCount,
             }),
         });
 

@@ -1178,8 +1178,9 @@ function initSocket() {
 function updateUsersList() {
     const users = [...battleData.participants.values()];
     const usersCount = battleData.participants.size;
+    const participantsCount = battleData.participants_count;
     const connectedUsersDiv = document.getElementById('battle_users_connected');
-    connectedUsersDiv.innerHTML = `Присоединились ${usersCount}/?:<br>` + users.map(username => `${username}`).join(', ');
+    connectedUsersDiv.innerHTML = `Присоединились ${usersCount}/${participantsCount}:<br>` + users.map(username => `${username}`).join(', ');
 
     const participantsDisplay = document.getElementById('participants-display');
     participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
