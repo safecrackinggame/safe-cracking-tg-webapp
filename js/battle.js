@@ -1159,9 +1159,12 @@ function initSocket() {
         console.log('[Socket] Disconnected from server.');
     });
 
-    socket.on('user_joined', (user) => {
-        console.log('[Socket] User joined:', user);
-        battleData.participants.set(user['sid'], user['user_name']);
+    socket.on('user_joined', (data) => {
+        console.log('[Socket] User joined:', data);
+
+        const newSid = data.new_sid
+
+        battleData.participants = data.users;
         updateUsersList();
     });
 
