@@ -1166,10 +1166,6 @@ function initSocket() {
 
         battleData.participants = new Map(Object.entries(data.users));
         updateUsersList();
-
-        const users = [...battleData.participants.values()];
-        const connectedUsersDiv = document.getElementById('battle_users_connected');
-        connectedUsersDiv.innerHTML = 'Присоединились 2/5:<br>' + users.map(username => `${username}`).join('<br>');
     });
 
     socket.on('user_disconnected', (sid) => {
@@ -1181,6 +1177,10 @@ function initSocket() {
 
 function updateUsersList() {
     const users = [...battleData.participants.values()];
+    const usersCount = battleData.participants.size;
+    const connectedUsersDiv = document.getElementById('battle_users_connected');
+    connectedUsersDiv.innerHTML = `Присоединились ${usersCount}/?:<br>` + users.map(username => `${username}`).join(', ');
+
     const participantsDisplay = document.getElementById('participants-display');
     participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
 }
