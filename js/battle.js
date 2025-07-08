@@ -554,6 +554,7 @@ async function loadBattleGameData() {
         return "[Load] Wrong Battle ID";
     }
     battleData = data.battle;
+    battleData.participants = new Map();
 
     const savedStats = localStorage.getItem('stats');
     if (savedStats) {
@@ -1158,13 +1159,23 @@ function initSocket() {
         console.log('[Socket] Disconnected from server.');
     });
 
-    socket.on('update_user_list', (users) => {
-        console.log('[Socket] Update users list:', users);
-
-        // Отображение участников батла
-        const participantsDisplay = document.getElementById('participants-display');
-        participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
+    socket.on('user_joined', (user) => {
+        console.log('[Socket] User joined:', user);
+        battleData.participants.set(user['sid'], user['user_name']);
+        updateUsersList();
     });
+
+    socket.on('user_disconnected', (sid) => {
+        console.log('[Socket] User disconnected:', sid);
+        battleData.participants.delete(sid);
+        updateUsersList();
+    });
+}
+
+function updateUsersList() {
+    const users = [...battleData.participants.values()];
+    const participantsDisplay = document.getElementById('participants-display');
+    participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
