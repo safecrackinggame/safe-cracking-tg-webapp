@@ -996,18 +996,6 @@ function updateUI() {
         }
     });
 
-    // Отображение участников батла
-    const userInfo = Telegram.WebApp.initDataUnsafe.user;
-    let username = userInfo.first_name;
-    battleData.participants = [username];
-    if (battleData.participants) {
-        console.log("[DEBUG] participants", battleData.participants);
-
-        const participantsDisplay = document.getElementById('participants-display');
-        participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
-        participantsDisplay.innerHTML = battleData.participants.map(username => `${username}`).join('<br>');
-    }
-
     // Отображение ссылки для приглашения
     const inviteLink = `https://t.me/Safe_Cracking_bot/game?startapp=battle_${battleId}`;
     const battleModeLabel = document.querySelector('.battle-mode-label');
@@ -1168,6 +1156,14 @@ function initSocket() {
 
     socket.on('disconnect', () => {
         console.log('[Socket] Disconnected from server.');
+    });
+
+    socket.on('update_user_list', (users) => {
+        console.log('[Socket] Update users list:', users);
+
+        // Отображение участников батла
+        const participantsDisplay = document.getElementById('participants-display');
+        participantsDisplay.innerHTML = users.map(username => `${username}`).join('<br>');
     });
 }
 
