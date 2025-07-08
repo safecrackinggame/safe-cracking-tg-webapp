@@ -1156,9 +1156,13 @@ function initSocket() {
     socket.on('connect', () => {
         console.log('[Socket] Connected to server. ID:', socket.id);
 
+        const userInfo = Telegram.WebApp.initDataUnsafe.user;
+        const user_name = userInfo.first_name;
+
         socket.emit('user_joined', {
             initData: Telegram.WebApp.initData,
-            battle_id: battleData.uid
+            battle_id: battleData.uid,
+            user_name: user_name
         });
     });
 
