@@ -45,5 +45,6 @@
   "hint_rule_3_2": "Три цифры верны, две на месте",
   "common_rule_description": "Неизвестное правило",
   "battles_link": "Интеллектуальные батлы",
-  "participants_label": "Участники"
+  "participants_label": "Участники",
+  "joined_users": "Присоединились"
 }
