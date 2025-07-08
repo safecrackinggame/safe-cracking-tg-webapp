@@ -60,6 +60,7 @@ let coinRecoveryCountdownSeconds = 0;
 let isDarkMode = localStorage.getItem('isDarkMode') === 'true';
 let isSoundEnabled = localStorage.getItem('isSoundEnabled') !== null ? localStorage.getItem('isSoundEnabled') === 'true' : true;
 let battleData = null;
+let socket = null;
 
 // --- Localization Variables ---
 let translations = {};
@@ -997,24 +998,14 @@ function updateUI() {
 
     // Отображение участников батла
     const userInfo = Telegram.WebApp.initDataUnsafe.user;
-    let username = null;
-    if (userInfo.username) {
-        username = userInfo.username;
-    } else {
-        username = userInfo.first_name;
-    }
+    let username = userInfo.first_name;
     battleData.participants = [username];
     if (battleData.participants) {
         console.log("[DEBUG] participants", battleData.participants);
-        const participantsDisplay = document.createElement('p');
-        participantsDisplay.innerHTML = translate('participants_label') + ":<br>" + battleData.participants.map(username => `${username}`).join('<br>');
+
+        const participantsDisplay = document.getElementById('participants-display');
         participantsDisplay.className = 'text-sm text-gray-600 dark:text-gray-300 mb-2';
-        if (!document.getElementById('participants-display')) {
-            document.querySelector('.game-container').insertBefore(participantsDisplay, hintModalOverlay);
-            participantsDisplay.id = 'participants-display';
-        } else {
-            document.getElementById('participants-display').innerHTML = participantsDisplay.innerHTML;
-        }
+        participantsDisplay.innerHTML = battleData.participants.map(username => `${username}`).join('<br>');
     }
 
     // Отображение ссылки для приглашения
@@ -1159,6 +1150,23 @@ function updateRewardRangeDisplay() {
     rewardRangeDisplay.textContent = '';
 }
 
+function initSocket() {
+    socket = io("https://scg.rain.dp.ua");
+
+    socket.on('connect', () => {
+        console.log('[Socket] Connected to server. ID:', socket.id);
+
+        // socket.emit('user_joined', {
+        //     username: username,
+        //     battle_id: battle_id
+        // });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('[Socket] Disconnected from server.');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[DOM Loaded] DOM content loaded. Starting a new game.");
 
@@ -1185,4 +1193,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     populateDifficultySelector();
 
     await loadTranslations(currentLanguage);
+
+    initSocket();
 });

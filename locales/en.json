@@ -44,5 +44,6 @@
   "hint_rule_2_0": "Two digits are correct, but not in their places",
   "hint_rule_3_2": "Three digits are correct, two in place",
   "common_rule_description": "Unknown rule",
-  "battles_link": "Intellectual battles"
+  "battles_link": "Intellectual battles",
+  "participants_label": "Participants"
 }

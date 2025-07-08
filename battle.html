@@ -469,6 +469,11 @@
         <div id="solution-display" class="text-2xl font-bold text-blue-700 mb-4"></div>
         <div id="game-end-buttons" class="flex space-x-4 mb-6 hidden"></div>
 
+        <p>
+            <div><span data-translate="participants_label">participants_label</span>:</div>
+            <div id="participants-display"></div>
+        </p>
+
         <div id="hint-modal-overlay" class="modal-overlay hidden">
             <div class="modal-content">
                 <p id="modal-message" class="text-xl font-semibold mb-6"></p>
@@ -493,6 +498,7 @@
         <a href="https://safecrackinggame.github.io/safe-cracking-tg-webapp/" class="footer-link" data-translate="single_game_link">Одиночная игра</a>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="./js/common.js"></script>
     <script src="./js/api.js"></script>
     <script src="./js/battle.js"></script>
